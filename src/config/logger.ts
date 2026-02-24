@@ -14,9 +14,7 @@ export const logger = pino({
                 },
             }
             : undefined, // Production: raw JSON for log aggregation (ELK, Datadog)
-    base: {
-        env: config.NODE_ENV,
-    },
+    base: { env: config.NODE_ENV },
     // Redact sensitive fields from logs
     redact: {
         paths: ['req.headers.authorization', 'req.body.password', 'req.body.refreshToken'],

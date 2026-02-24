@@ -8,6 +8,7 @@ import { requestId } from './shared/middleware/request-id';
 import { globalRateLimiter } from './shared/middleware/rate-limit';
 import { errorHandler } from './shared/middleware/error-handler';
 import { StatusCodes } from 'http-status-codes';
+import authRoutes from './modules/auth/auth.routes';
 
 const app: Application = express();
 
@@ -56,10 +57,9 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // ─── API Routes ───────────────────────────────────────────
-// Module routes will be registered here in subsequent phases:
-// app.use(`${config.API_PREFIX}/auth`, authRoutes);
+app.use(`${config.API_PREFIX}/auth`, authRoutes);
+// Future module routes:
 // app.use(`${config.API_PREFIX}/societies`, societyRoutes);
-// etc.
 
 // ─── 404 Catch-All ────────────────────────────────────────
 app.use((_req: Request, res: Response) => {

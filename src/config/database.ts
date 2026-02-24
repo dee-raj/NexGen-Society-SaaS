@@ -15,7 +15,7 @@ export const connectDatabase = async (): Promise<void> => {
             autoIndex: config.NODE_ENV !== 'production',
         });
 
-        logger.info('✅ MongoDB connected');
+        logger.info('MongoDB connected');
 
         mongoose.connection.on('error', (err) => {
             logger.error({ err }, 'MongoDB connection error');
@@ -25,7 +25,7 @@ export const connectDatabase = async (): Promise<void> => {
             logger.warn('MongoDB disconnected — attempting reconnect');
         });
     } catch (error) {
-        logger.fatal({ error }, '❌ MongoDB initial connection failed');
+        logger.fatal({ error }, 'MongoDB initial connection failed');
         process.exit(1);
     }
 };

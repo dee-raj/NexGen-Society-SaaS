@@ -15,7 +15,7 @@ const server = http.createServer(app);
  * 4. Exit process
  */
 const gracefulShutdown = async (signal: string): Promise<void> => {
-    logger.info(`⚡ ${signal} received — starting graceful shutdown`);
+    logger.info(`${signal} received — starting graceful shutdown`);
 
     server.close(async () => {
         logger.info('HTTP server closed — no new connections');
@@ -47,10 +47,10 @@ const bootstrap = async (): Promise<void> => {
         // Start HTTP server
         server.listen(config.PORT, () => {
             logger.info(
-                `🚀 Server running on port ${config.PORT} [${config.NODE_ENV}]`,
+                `Server running on port ${config.PORT} [${config.NODE_ENV}]`,
             );
-            logger.info(`📡 API prefix: ${config.API_PREFIX}`);
-            logger.info(`❤️  Health: http://localhost:${config.PORT}/health`);
+            logger.info(`API prefix: ${config.API_PREFIX}`);
+            logger.info(`Health: http://localhost:${config.PORT}/health`);
         });
 
         // Shutdown handlers
@@ -68,7 +68,7 @@ const bootstrap = async (): Promise<void> => {
             gracefulShutdown('uncaughtException');
         });
     } catch (error) {
-        logger.fatal({ error }, '❌ Bootstrap failed');
+        logger.fatal({ error }, 'Bootstrap failed');
         process.exit(1);
     }
 };
