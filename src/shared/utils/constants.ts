@@ -54,6 +54,42 @@ export enum TicketStatus {
     CLOSED = 'closed',
 }
 
+export enum BuildingType {
+    RESIDENTIAL = 'residential',
+    COMMERCIAL = 'commercial',
+    MIXED = 'mixed',
+}
+
+export enum FlatType {
+    APARTMENT = 'apartment',
+    PENTHOUSE = 'penthouse',
+    STUDIO = 'studio',
+    DUPLEX = 'duplex',
+    SHOP = 'shop',
+    OFFICE = 'office',
+}
+
+export enum ResidentType {
+    OWNER = 'owner',
+    TENANT = 'tenant',
+    FAMILY_MEMBER = 'family_member',
+}
+
+export enum StaffType {
+    PERMANENT = 'permanent',
+    CONTRACT = 'contract',
+    TEMPORARY = 'temporary',
+}
+
+export enum StaffDepartment {
+    SECURITY = 'security',
+    MAINTENANCE = 'maintenance',
+    HOUSEKEEPING = 'housekeeping',
+    ADMINISTRATION = 'administration',
+    GARDENING = 'gardening',
+    OTHER = 'other',
+}
+
 /** Pagination defaults */
 export const PAGINATION = {
     DEFAULT_PAGE: 1,

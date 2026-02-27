@@ -9,6 +9,11 @@ import { globalRateLimiter } from './shared/middleware/rate-limit';
 import { errorHandler } from './shared/middleware/error-handler';
 import { StatusCodes } from 'http-status-codes';
 import authRoutes from './modules/auth/auth.routes';
+import noticeRoutes from './modules/notices/notices.routes';
+import societyRoutes from '@modules/society/society.routes';
+import residentRoutes from '@modules/resident/resident.routes';
+import buildingRoutes from '@modules/building/building.routes';
+import flatRoutes from '@modules/flat/flat.routes';
 
 const app: Application = express();
 
@@ -58,8 +63,11 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // ─── API Routes ───────────────────────────────────────────
 app.use(`${config.API_PREFIX}/auth`, authRoutes);
-// Future module routes:
-// app.use(`${config.API_PREFIX}/societies`, societyRoutes);
+app.use(`${config.API_PREFIX}/notices`, noticeRoutes);
+app.use(`${config.API_PREFIX}/societies`, societyRoutes);
+app.use(`${config.API_PREFIX}/residents`, residentRoutes);
+app.use(`${config.API_PREFIX}/buildings`, buildingRoutes);
+app.use(`${config.API_PREFIX}/flats`, flatRoutes);
 
 // ─── 404 Catch-All ────────────────────────────────────────
 app.use((_req: Request, res: Response) => {
