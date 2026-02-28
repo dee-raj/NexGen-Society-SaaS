@@ -90,6 +90,43 @@ export enum StaffDepartment {
     OTHER = 'other',
 }
 
+export enum CalculationMethod {
+    FIXED = 'fixed',
+    PER_SQFT = 'per_sqft',
+}
+
+export enum InvoiceStatus {
+    DRAFT = 'draft',
+    ISSUED = 'issued',
+    PAID = 'paid',
+    OVERDUE = 'overdue',
+    CANCELLED = 'cancelled',
+}
+
+export enum PaymentMethod {
+    CASH = 'cash',
+    CHEQUE = 'cheque',
+    ONLINE = 'online',
+    UPI = 'upi',
+    BANK_TRANSFER = 'bank_transfer',
+}
+
+export enum ExpenseCategory {
+    MAINTENANCE = 'maintenance',
+    UTILITY = 'utility',
+    SALARY = 'salary',
+    REPAIR = 'repair',
+    EVENT = 'event',
+    OTHER = 'other',
+}
+
+export enum ExpenseStatus {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    PAID = 'paid',
+    REJECTED = 'rejected',
+}
+
 /** Pagination defaults */
 export const PAGINATION = {
     DEFAULT_PAGE: 1,

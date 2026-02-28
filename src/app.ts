@@ -14,6 +14,7 @@ import societyRoutes from '@modules/society/society.routes';
 import residentRoutes from '@modules/resident/resident.routes';
 import buildingRoutes from '@modules/building/building.routes';
 import flatRoutes from '@modules/flat/flat.routes';
+import { financeRoutes } from './modules/finance/finance.routes';
 
 const app: Application = express();
 
@@ -68,6 +69,7 @@ app.use(`${config.API_PREFIX}/societies`, societyRoutes);
 app.use(`${config.API_PREFIX}/residents`, residentRoutes);
 app.use(`${config.API_PREFIX}/buildings`, buildingRoutes);
 app.use(`${config.API_PREFIX}/flats`, flatRoutes);
+app.use(`${config.API_PREFIX}/finance`, financeRoutes);
 
 // ─── 404 Catch-All ────────────────────────────────────────
 app.use((_req: Request, res: Response) => {

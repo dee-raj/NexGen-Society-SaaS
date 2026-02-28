@@ -18,10 +18,29 @@ const router = Router();
  */
 router.use(authenticate, authorize(Role.SUPER_ADMIN));
 
-router.get('/', SocietyController.getAll);
-router.get('/:id', validate(societyIdParamSchema), SocietyController.getById);
-router.post('/', validate(createSocietySchema), SocietyController.create);
-router.patch('/:id', validate(updateSocietySchema), SocietyController.update);
-router.delete('/:id', validate(societyIdParamSchema), SocietyController.delete);
+router.get(
+    '/fetch-all',
+    SocietyController.getAll
+);
+router.get(
+    '/fetch-one/:id',
+    validate(societyIdParamSchema),
+    SocietyController.getById
+);
+router.post(
+    '/create',
+    validate(createSocietySchema),
+    SocietyController.create
+);
+router.patch(
+    '/update/:id',
+    validate(updateSocietySchema),
+    SocietyController.update
+);
+router.delete(
+    '/delete/:id',
+    validate(societyIdParamSchema),
+    SocietyController.delete
+);
 
 export default router;

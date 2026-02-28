@@ -26,7 +26,7 @@ export const registerSchema = z.object({
             .regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number')
             .optional(),
         role: z
-            .nativeEnum(Role)
+            .nativeEnum(Role) // no super admin here
             .optional()
             .default(Role.RESIDENT),
     }).strict(),
