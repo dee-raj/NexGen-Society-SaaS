@@ -3,6 +3,7 @@ export enum Role {
     SUPER_ADMIN = 'SUPER_ADMIN',
     SOCIETY_ADMIN = 'SOCIETY_ADMIN',
     RESIDENT = 'RESIDENT',
+    STAFF = 'STAFF',
 }
 
 export enum SocietyStatus {
@@ -88,6 +89,12 @@ export enum StaffDepartment {
     ADMINISTRATION = 'administration',
     GARDENING = 'gardening',
     OTHER = 'other',
+}
+
+export enum StaffStatus {
+    ACTIVE = 'active',
+    INACTIVE = 'inactive',
+    SUSPENDED = 'suspended',
 }
 
 export enum CalculationMethod {

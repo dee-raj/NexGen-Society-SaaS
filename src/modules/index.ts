@@ -11,6 +11,7 @@ import procurementRoutes from './procurement/procurement.routes';
 import complaintRoutes from './complaint/complaint.routes';
 import notificationRoutes from './notification/notification.routes';
 import analyticsRoutes from './analytics/analytics.routes';
+import staffRoutes from './staff/staff.routes';
 
 const rootRouter = Router();
 
@@ -25,5 +26,6 @@ rootRouter.use("/procurement", procurementRoutes);
 rootRouter.use("/complaints", complaintRoutes);
 rootRouter.use("/notifications", notificationRoutes);
 rootRouter.use("/analytics", analyticsRoutes);
+rootRouter.use("/staff", staffRoutes);
 
 export default rootRouter;
