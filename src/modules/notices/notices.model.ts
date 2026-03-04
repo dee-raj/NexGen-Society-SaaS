@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { INotice, NoticePriority } from './notices.types';
-import { tenantScopePlugin } from '../../shared/plugins/tenant-scope.plugin';
-import { auditLogPlugin } from '../../shared/plugins/audit-log.plugin';
+import { tenantScopePlugin } from '@shared/plugins/tenant-scope.plugin';
+import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const noticeSchema = new Schema<INotice>(
     {

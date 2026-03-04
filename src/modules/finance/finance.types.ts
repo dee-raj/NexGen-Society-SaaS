@@ -6,7 +6,7 @@ import {
     LedgerEntryType,
     ExpenseCategory,
     ExpenseStatus,
-} from '../../shared/utils/constants';
+} from '@shared/utils/constants';
 
 // ── MaintenanceTemplate ──────────────────────────────────────
 

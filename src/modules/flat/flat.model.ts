@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import { IFlat } from './flat.types';
-import { FlatType } from '../../shared/utils/constants';
-import { tenantScopePlugin } from '../../shared/plugins/tenant-scope.plugin';
-import { auditLogPlugin } from '../../shared/plugins/audit-log.plugin';
+import { FlatType } from '@shared/utils/constants';
+import { tenantScopePlugin } from '@shared/plugins/tenant-scope.plugin';
+import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const flatSchema = new Schema<IFlat>(
     {

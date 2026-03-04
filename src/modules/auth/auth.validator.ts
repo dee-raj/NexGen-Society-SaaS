@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Role } from '../../shared/utils/constants';
+import { Role } from '@shared/utils/constants';
 
 export const registerSchema = z.object({
     body: z.object({

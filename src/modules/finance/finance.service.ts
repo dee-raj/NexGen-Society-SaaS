@@ -1,4 +1,4 @@
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import {
     Invoice,
     Payment,
@@ -13,7 +13,8 @@ import {
     LedgerEntryType,
     ResidentStatus,
     CalculationMethod,
-} from '../../shared/utils/constants';
+} from '@shared/utils/constants';
+import { NotFoundError } from '@shared/utils/api-error';
 
 export class FinanceService {
     /**
@@ -31,31 +32,30 @@ export class FinanceService {
         year: number,
         dueDate: Date,
     ) {
-        const session = await mongoose.startSession();
-        session.startTransaction();
 
         try {
             const template = await MaintenanceTemplate.findOne({
                 _id: templateId,
                 societyId,
                 isActive: true,
-            }).session(session);
+            }).setOptions({ tenantId: societyId });
 
             if (!template) {
-                throw new Error('Active maintenance template not found');
+                throw new NotFoundError('Active maintenance template not found');
             }
 
             // Get all flats with their active residents (typically owners or tenants responsible for maintenance)
             // Simplified: Generate an invoice per flat, assigned to the primary active resident
-            const flats = await Flat.find({ societyId }).session(session);
+            const flats = await Flat.find({ societyId }).setOptions({ tenantId: societyId });
             let generatedCount = 0;
+
 
             for (const flat of flats) {
                 // Find primary active resident for the flat
                 const resident = await Resident.findOne({
                     flatId: flat._id,
                     status: ResidentStatus.ACTIVE,
-                }).session(session);
+                }).setOptions({ tenantId: societyId });
 
                 if (!resident) continue; // Skip flats without active residents
 
@@ -64,7 +64,7 @@ export class FinanceService {
                     flatId: flat._id,
                     'period.month': month,
                     'period.year': year,
-                }).session(session);
+                }).setOptions({ tenantId: societyId });
 
                 if (existingInvoice) continue;
 
@@ -82,7 +82,7 @@ export class FinanceService {
                 const invoiceNumber = `INV-${year}${month.toString().padStart(2, '0')}-${flat.unitNumber}`;
 
                 // Create Invoice
-                const invoice = new Invoice({
+                const invoice = await Invoice.create({
                     societyId,
                     residentId: resident._id,
                     flatId: flat._id,
@@ -101,7 +101,8 @@ export class FinanceService {
                     status: InvoiceStatus.ISSUED,
                 });
 
-                await invoice.save({ session });
+                console.log({ invoice });
+
 
                 // Create DEBIT Ledger Entry for the invoice generated
                 // First get current balance for the society (simplistic form: total balance across society context)
@@ -111,12 +112,12 @@ export class FinanceService {
 
                 const lastEntry = await LedgerEntry.findOne({ societyId })
                     .sort({ date: -1, createdAt: -1 })
-                    .session(session);
+                    .setOptions({ tenantId: societyId });
 
                 const currentBalance = lastEntry ? lastEntry.balance : 0;
                 const newBalance = currentBalance + amount; // Accounts Receivable increases
 
-                const ledgerEntry = new LedgerEntry({
+                const ledgerEntry = await LedgerEntry.create({
                     societyId,
                     type: LedgerEntryType.DEBIT,
                     amount,
@@ -127,17 +128,13 @@ export class FinanceService {
                     date: new Date(),
                 });
 
-                await ledgerEntry.save({ session });
                 generatedCount++;
             }
 
-            await session.commitTransaction();
             return { message: `${generatedCount} invoices generated successfully.` };
         } catch (error) {
-            await session.abortTransaction();
+            console.error('Error generating invoices:', error);
             throw error;
-        } finally {
-            session.endSession();
         }
     }
 
@@ -152,11 +149,9 @@ export class FinanceService {
         transactionReference?: string,
         notes?: string,
     ) {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
         try {
-            const invoice = await Invoice.findOne({ _id: invoiceId, societyId }).session(session);
+            const invoice = await Invoice.findOne({ _id: invoiceId, societyId })
+                .setOptions({ tenantId: societyId });
 
             if (!invoice) {
                 throw new Error('Invoice not found');
@@ -187,7 +182,7 @@ export class FinanceService {
                 notes,
             });
 
-            await payment.save({ session });
+            await payment.save();
 
             // Update Invoice
             invoice.amountPaid += amount;
@@ -197,12 +192,12 @@ export class FinanceService {
                 invoice.status = InvoiceStatus.ISSUED; // Or PARTIALLY_PAID if you had the enum
             }
 
-            await invoice.save({ session });
+            await invoice.save();
 
             // Create CREDIT Ledger Entry (Money received)
             const lastEntry = await LedgerEntry.findOne({ societyId })
-                .sort({ date: -1, createdAt: -1 })
-                .session(session);
+                .setOptions({ tenantId: societyId })
+                .sort({ date: -1, createdAt: -1 });
 
             const currentBalance = lastEntry ? lastEntry.balance : 0;
             // Accounts Receivable decreases, or Bank Balance increases.
@@ -221,15 +216,12 @@ export class FinanceService {
                 date: new Date(),
             });
 
-            await ledgerEntry.save({ session });
+            await ledgerEntry.save();
 
-            await session.commitTransaction();
             return payment;
         } catch (error) {
-            await session.abortTransaction();
+            console.error('Error processing payment:', error);
             throw error;
-        } finally {
-            session.endSession();
         }
     }
 
@@ -237,16 +229,13 @@ export class FinanceService {
      * Applies late fees to all overdue invoices
      */
     static async applyLateFees(societyId: string, lateFeeAmount: number) {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
         try {
             const currentDate = new Date();
             const overdueInvoices = await Invoice.find({
                 societyId,
                 dueDate: { $lt: currentDate },
                 status: { $in: [InvoiceStatus.ISSUED, InvoiceStatus.OVERDUE] }, // Only active unpaid
-            }).session(session);
+            }).setOptions({ tenantId: societyId });
 
             let appliedCount = 0;
 
@@ -264,12 +253,12 @@ export class FinanceService {
                         amount: lateFeeAmount
                     });
 
-                    await invoice.save({ session });
+                    await invoice.save();
 
                     // DEBIT entry for late fee
                     const lastEntry = await LedgerEntry.findOne({ societyId })
-                        .sort({ date: -1, createdAt: -1 })
-                        .session(session);
+                        .setOptions({ tenantId: societyId })
+                        .sort({ date: -1, createdAt: -1 });
 
                     const currentBalance = lastEntry ? lastEntry.balance : 0;
 
@@ -284,18 +273,14 @@ export class FinanceService {
                         date: new Date(),
                     });
 
-                    await ledgerEntry.save({ session });
+                    await ledgerEntry.save();
                     appliedCount++;
                 }
             }
-
-            await session.commitTransaction();
             return { message: `Late fees applied to ${appliedCount} invoices.` };
         } catch (error) {
-            await session.abortTransaction();
+            console.error('Error applying late fees:', error);
             throw error;
-        } finally {
-            session.endSession();
         }
     }
 
@@ -361,7 +346,7 @@ export class FinanceService {
                     phone: '$user.phone'
                 }
             }
-        ]);
+        ]).option({ tenantId: societyId });
 
         return defaulters;
     }

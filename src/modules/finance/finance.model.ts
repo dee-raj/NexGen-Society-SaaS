@@ -13,9 +13,9 @@ import {
     LedgerEntryType,
     ExpenseCategory,
     ExpenseStatus,
-} from '../../shared/utils/constants';
-import { tenantScopePlugin } from '../../shared/plugins/tenant-scope.plugin';
-import { auditLogPlugin } from '../../shared/plugins/audit-log.plugin';
+} from '@shared/utils/constants';
+import { tenantScopePlugin } from '@shared/plugins/tenant-scope.plugin';
+import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const transformJSON = {
     transform(_doc: any, ret: Record<string, unknown>) {
@@ -146,17 +146,15 @@ invoiceSchema.plugin(tenantScopePlugin);
 invoiceSchema.plugin(auditLogPlugin);
 
 // Prevent modifications if status is PAID or CANCELLED unless it's a specific internal update
-invoiceSchema.pre('save', function (next: any) {
+invoiceSchema.pre('save', function () {
     if (!this.isNew && this.isModified()) {
         const locals = this.$locals as { originalDocument?: IInvoice };
         const original = locals.originalDocument;
         if (original && (original.status === InvoiceStatus.PAID || original.status === InvoiceStatus.CANCELLED)) {
             // Cannot modify a paid or cancelled invoice (exceptions could be added if needed)
-            const err = new Error('Cannot modify a paid or cancelled invoice');
-            return next(err);
+            throw new Error('Cannot modify a paid or cancelled invoice');
         }
     }
-    next();
 });
 
 invoiceSchema.post('init', function (doc) {
@@ -268,21 +266,20 @@ const ledgerEntrySchema = new Schema<ILedgerEntry>(
 ledgerEntrySchema.plugin(tenantScopePlugin);
 
 // Pre-save hook to enforce immutability
-ledgerEntrySchema.pre('save', function (next: any) {
+ledgerEntrySchema.pre('save', function () {
     if (!this.isNew) {
-        return next(new Error('LedgerEntry is immutable and cannot be updated.'));
+        throw new Error('LedgerEntry is immutable and cannot be updated.');
     }
-    next();
 });
 
 // Disable update methods entirely for this schema (append-only ledger constraint)
-ledgerEntrySchema.pre(/update|updateOne|updateMany|findOneAndUpdate/, function (next: any) {
-    next(new Error('Updating a LedgerEntry is strictly prohibited. Use compensatory transactions instead.'));
+ledgerEntrySchema.pre(/update|updateOne|updateMany|findOneAndUpdate/, function () {
+    throw new Error('Updating a LedgerEntry is strictly prohibited. Use compensatory transactions instead.');
 });
 
 // Disable delete methods entirely
-ledgerEntrySchema.pre(/deleteOne|deleteMany|findOneAndDelete|remove/, function (next: any) {
-    next(new Error('Deleting a LedgerEntry is strictly prohibited. Use compensatory transactions instead.'));
+ledgerEntrySchema.pre(/deleteOne|deleteMany|findOneAndDelete|remove/, function () {
+    throw new Error('Deleting a LedgerEntry is strictly prohibited. Use compensatory transactions instead.');
 });
 
 ledgerEntrySchema.index({ societyId: 1, date: -1 });

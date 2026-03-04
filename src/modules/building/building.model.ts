@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import { IBuilding } from './building.types';
-import { BuildingType } from '../../shared/utils/constants';
-import { tenantScopePlugin } from '../../shared/plugins/tenant-scope.plugin';
-import { auditLogPlugin } from '../../shared/plugins/audit-log.plugin';
+import { BuildingType } from '@shared/utils/constants';
+import { tenantScopePlugin } from '@shared/plugins/tenant-scope.plugin';
+import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const buildingSchema = new Schema<IBuilding>(
     {

@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { ResidentType, ResidentStatus } from '../../shared/utils/constants';
+import { ResidentType, ResidentStatus } from '@shared/utils/constants';
 
 /** Resident document shape after Mongoose hydration */
 export interface IResident extends Document {

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { ResidentService } from './resident.service';
-import { ApiResponse } from '../../shared/utils/api-response';
-import { asyncHandler } from '../../shared/utils/async-handler';
-import { BadRequestError, NotFoundError } from '../../shared/utils/api-error';
+import { ApiResponse } from '@shared/utils/api-response';
+import { asyncHandler } from '@shared/utils/async-handler';
+import { BadRequestError, NotFoundError } from '@shared/utils/api-error';
 
 export class ResidentController {
     static getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {

@@ -1,4 +1,4 @@
-import { TenantService } from '../../shared/services/tenant.service';
+import { TenantService } from '@shared/services/tenant.service';
 import { IResident } from './resident.types';
 import { Resident } from './resident.model';
 import { CreateResidentInput, UpdateResidentInput } from './resident.validator';

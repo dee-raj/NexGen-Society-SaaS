@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { IUser } from './auth.types';
-import { Role } from '../../shared/utils/constants';
+import { Role } from '@shared/utils/constants';
 import mongoose, { Schema } from 'mongoose';
 
 const BCRYPT_ROUNDS = 12;

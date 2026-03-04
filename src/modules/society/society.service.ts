@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { Society } from './society.model';
 import { ISociety } from './society.types';
 import { CreateSocietyInput, UpdateSocietyInput } from './society.validator';
-import { ConflictError, NotFoundError } from '../../shared/utils/api-error';
+import { ConflictError, NotFoundError } from '@shared/utils/api-error';
 
 /**
  * Society service — NOT tenant-scoped.

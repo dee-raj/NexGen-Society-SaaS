@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FlatType } from '../../shared/utils/constants';
+import { FlatType } from '@shared/utils/constants';
 
 export const createFlatSchema = z.object({
     body: z.object({

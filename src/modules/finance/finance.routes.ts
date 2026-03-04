@@ -8,10 +8,10 @@ import {
     createExpenseSchema,
     updateExpenseStatusSchema,
 } from './finance.validation';
-import { validate } from '../../shared/middleware/validate';
-import { Role } from '../../shared/utils/constants';
+import { validate } from '@shared/middleware/validate';
+import { Role } from '@shared/utils/constants';
 import { authenticate } from '@shared/middleware/authenticate';
-import { authorize } from '../../shared/middleware/authorize';
+import { authorize } from '@shared/middleware/authorize';
 const router = Router();
 
 // Only SOCIETY_ADMIN and SUPER_ADMIN can manage society finances

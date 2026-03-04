@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { FlatType } from '../../shared/utils/constants';
+import { FlatType } from '@shared/utils/constants';
 
 /** Flat document shape after Mongoose hydration */
 export interface IFlat extends Document {

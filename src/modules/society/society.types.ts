@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { SocietyStatus } from '../../shared/utils/constants';
+import { SocietyStatus } from '@shared/utils/constants';
 
 /** Society document shape after Mongoose hydration */
 export interface ISociety extends Document {

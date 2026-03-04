@@ -1,4 +1,4 @@
-import { TenantService } from '../../shared/services/tenant.service';
+import { TenantService } from '@shared/services/tenant.service';
 import { INotice } from './notices.types';
 import { Notice } from './notices.model';
 import { CreateNoticeInput, UpdateNoticeInput } from './notices.validator';

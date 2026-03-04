@@ -4,14 +4,14 @@ import {
     PaymentMethod,
     ExpenseCategory,
     ExpenseStatus,
-} from '../../shared/utils/constants';
+} from '@shared/utils/constants';
 
 // ── MaintenanceTemplate Validation ───────────────────────────
 
 export const createMaintenanceTemplateSchema = z.object({
     body: z.object({
         name: z.string().min(2).max(100),
-        calculationMethod: z.nativeEnum(CalculationMethod),
+        calculationMethod: z.enum(CalculationMethod),
         amountOrRate: z.number().positive(),
         description: z.string().max(500).optional(),
     }),
@@ -36,7 +36,7 @@ export const processPaymentSchema = z.object({
     body: z.object({
         invoiceId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid invoice ID'),
         amount: z.number().positive(),
-        paymentMethod: z.nativeEnum(PaymentMethod),
+        paymentMethod: z.enum(PaymentMethod),
         transactionReference: z.string().optional(),
         notes: z.string().optional(),
     }),
@@ -60,9 +60,9 @@ export const createExpenseSchema = z.object({
         date: z.string().refine((val) => !isNaN(Date.parse(val)), {
             message: 'Invalid date format',
         }),
-        category: z.nativeEnum(ExpenseCategory),
+        category: z.enum(ExpenseCategory),
         vendorName: z.string().optional(),
-        invoiceUrl: z.string().url().optional(),
+        invoiceUrl: z.url().optional(),
     }),
 });
 
@@ -71,6 +71,6 @@ export const updateExpenseStatusSchema = z.object({
         id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid expense ID'),
     }),
     body: z.object({
-        status: z.nativeEnum(ExpenseStatus),
+        status: z.enum(ExpenseStatus),
     }),
 });

@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { BuildingType } from '../../shared/utils/constants';
+import { BuildingType } from '@shared/utils/constants';
 
 /** Building document shape after Mongoose hydration */
 export interface IBuilding extends Document {

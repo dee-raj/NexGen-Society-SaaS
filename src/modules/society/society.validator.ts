@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SocietyStatus } from '../../shared/utils/constants';
+import { SocietyStatus } from '@shared/utils/constants';
 
 export const createSocietySchema = z.object({
     body: z.object({

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BuildingType } from '../../shared/utils/constants';
+import { BuildingType } from '@shared/utils/constants';
 
 export const createBuildingSchema = z.object({
     body: z.object({

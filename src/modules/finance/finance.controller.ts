@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { FinanceService } from './finance.service';
 import { MaintenanceTemplate, Invoice, Payment, LedgerEntry, Expense } from './finance.model';
-import { ApiResponse } from '../../shared/utils/api-response';
+import { ApiResponse } from '@shared/utils/api-response';
 import { NotFoundError } from '@shared/utils/api-error';
 
 
@@ -26,7 +26,7 @@ export class FinanceController {
     static async getTemplates(req: Request, res: Response, next: NextFunction) {
         try {
             const societyId = req.user?.societyId!;
-            const templates = await MaintenanceTemplate.find({ societyId });
+            const templates = await MaintenanceTemplate.find({ societyId }).setOptions({ tenantId: societyId })
             ApiResponse.success(res, templates, 200);
         } catch (error) {
             next(error);
@@ -57,9 +57,19 @@ export class FinanceController {
     static async getInvoices(req: Request, res: Response, next: NextFunction) {
         try {
             const societyId = req.user?.societyId!;
+
             const invoices = await Invoice.find({ societyId })
-                .populate('residentId', 'userId type status')
-                .populate('flatId', 'number block floor')
+                .setOptions({ tenantId: societyId })
+                .populate({
+                    path: 'residentId',
+                    select: 'userId type status',
+                    options: { tenantId: societyId }
+                })
+                .populate({
+                    path: 'flatId',
+                    select: 'number block floor',
+                    options: { tenantId: societyId }
+                })
                 .sort({ issueDate: -1 });
 
             ApiResponse.success(res, invoices, 200);
@@ -94,8 +104,17 @@ export class FinanceController {
         try {
             const societyId = req.user?.societyId!;
             const payments = await Payment.find({ societyId })
-                .populate('residentId', 'userId type')
-                .populate('invoiceId', 'invoiceNumber totalAmount status')
+                .setOptions({ tenantId: societyId })
+                .populate({
+                    path: 'residentId',
+                    select: 'userId type',
+                    options: { tenantId: societyId }
+                })
+                .populate({
+                    path: 'invoiceId',
+                    select: 'invoiceNumber totalAmount status',
+                    options: { tenantId: societyId }
+                })
                 .sort({ paymentDate: -1 });
 
             ApiResponse.success(res, payments, 200);
@@ -110,7 +129,9 @@ export class FinanceController {
         try {
             const societyId = req.user?.societyId!;
             // Ledger entries are append-only. We fetch them ordered by date descending.
-            const entries = await LedgerEntry.find({ societyId }).sort({ date: -1, createdAt: -1 });
+            const entries = await LedgerEntry.find({ societyId })
+                .setOptions({ tenantId: societyId })
+                .sort({ date: -1, createdAt: -1 });
 
             // The latest entry has the current balance
             const currentBalance = entries.length > 0 ? entries[0].balance : 0;
@@ -171,7 +192,9 @@ export class FinanceController {
     static async getExpenses(req: Request, res: Response, next: NextFunction) {
         try {
             const societyId = req.user?.societyId!;
-            const expenses = await Expense.find({ societyId }).sort({ date: -1 });
+            const expenses = await Expense.find({ societyId })
+                .sort({ date: -1 })
+                .setOptions({ tenantId: societyId });
             ApiResponse.success(res, expenses, 200);
         } catch (error) {
             next(error);
@@ -188,7 +211,7 @@ export class FinanceController {
                 { _id: id, societyId },
                 { status, approvedBy: req.user?.userId },
                 { new: true }
-            );
+            ).setOptions({ tenantId: societyId });
 
             if (!expense) {
                 throw new NotFoundError('Expense not found');

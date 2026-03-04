@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { ApiResponse } from '../../shared/utils/api-response';
+import { ApiResponse } from '@shared/utils/api-response';
 import { StatusCodes } from 'http-status-codes';
-import { BadRequestError } from '../../shared/utils/api-error';
-import { asyncHandler } from '../../shared/utils/async-handler';
+import { BadRequestError } from '@shared/utils/api-error';
+import { asyncHandler } from '@shared/utils/async-handler';
 
 export class AuthController {
     /**

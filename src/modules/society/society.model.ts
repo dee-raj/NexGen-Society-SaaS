@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { ISociety } from './society.types';
-import { SocietyStatus } from '../../shared/utils/constants';
-import { auditLogPlugin } from '../../shared/plugins/audit-log.plugin';
+import { SocietyStatus } from '@shared/utils/constants';
+import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const societySchema = new Schema<ISociety>(
     {

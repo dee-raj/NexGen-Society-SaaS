@@ -17,8 +17,8 @@ import {
     ConflictError,
     UnauthorizedError,
     BadRequestError,
-} from '../../shared/utils/api-error';
-import { Role } from '../../shared/utils/constants';
+} from '@shared/utils/api-error';
+import { Role } from '@shared/utils/constants';
 
 // ── Helpers ──────────────────────────────────────────────
 

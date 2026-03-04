@@ -1,5 +1,5 @@
 import { Document, Types } from 'mongoose';
-import { Role } from '../../shared/utils/constants';
+import { Role } from '@shared/utils/constants';
 
 /** User document shape after Mongoose hydration */
 export interface IUser extends Document {

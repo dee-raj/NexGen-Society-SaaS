@@ -1,7 +1,8 @@
-import { TenantService } from '../../shared/services/tenant.service';
+import { TenantService } from '@shared/services/tenant.service';
 import { IBuilding } from './building.types';
 import { Building } from './building.model';
 import { CreateBuildingInput, UpdateBuildingInput } from './building.validator';
+import { ConflictError } from '@shared/utils/api-error';
 
 /**
  * Building service — extends TenantService for automatic tenant scoping.
@@ -12,6 +13,13 @@ class BuildingServiceClass extends TenantService<IBuilding> {
     }
 
     async createBuilding(tenantId: string, data: CreateBuildingInput, userId: string): Promise<IBuilding> {
+        // Check for duplicate name
+        if (data.name) {
+            const existing = await Building.findOne({ name: data.name, societyId: tenantId });
+            if (existing) {
+                throw new ConflictError('Building with this name already exists');
+            }
+        }
         return this.create(tenantId, {
             ...data,
             createdBy: userId as unknown as IBuilding['createdBy'],
@@ -25,6 +33,13 @@ class BuildingServiceClass extends TenantService<IBuilding> {
         data: UpdateBuildingInput,
         userId: string,
     ): Promise<IBuilding | null> {
+        // Check for duplicate name
+        if (data.name) {
+            const existing = await Building.findOne({ name: data.name, societyId: tenantId, _id: { $ne: id } });
+            if (existing) {
+                throw new ConflictError('Building with this name already exists');
+            }
+        }
         return this.updateById(tenantId, id, { ...data, updatedBy: userId });
     }
 }

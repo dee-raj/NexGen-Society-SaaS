@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import { IResident } from './resident.types';
-import { ResidentType, ResidentStatus } from '../../shared/utils/constants';
-import { tenantScopePlugin } from '../../shared/plugins/tenant-scope.plugin';
-import { auditLogPlugin } from '../../shared/plugins/audit-log.plugin';
+import { ResidentType, ResidentStatus } from '@shared/utils/constants';
+import { tenantScopePlugin } from '@shared/plugins/tenant-scope.plugin';
+import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const residentSchema = new Schema<IResident>(
     {

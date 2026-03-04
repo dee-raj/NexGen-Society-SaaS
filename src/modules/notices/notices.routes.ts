@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { NoticesController } from './notices.controller';
-import { validate } from '../../shared/middleware/validate';
-import { authenticate } from '../../shared/middleware/authenticate';
-import { tenantContext } from '../../shared/middleware/tenant-context';
-import { authorize } from '../../shared/middleware/authorize';
-import { Role } from '../../shared/utils/constants';
+import { validate } from '@shared/middleware/validate';
+import { authenticate } from '@shared/middleware/authenticate';
+import { tenantContext } from '@shared/middleware/tenant-context';
+import { authorize } from '@shared/middleware/authorize';
+import { Role } from '@shared/utils/constants';
 import {
     createNoticeSchema,
     updateNoticeSchema,

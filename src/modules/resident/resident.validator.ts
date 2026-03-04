@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ResidentType, ResidentStatus } from '../../shared/utils/constants';
+import { ResidentType, ResidentStatus } from '@shared/utils/constants';
 
 export const createResidentSchema = z.object({
     body: z.object({
@@ -10,15 +10,15 @@ export const createResidentSchema = z.object({
             .string({ message: 'Flat ID is required' })
             .min(1, 'Flat ID is required'),
         type: z
-            .nativeEnum(ResidentType)
+            .enum(ResidentType)
             .optional()
             .default(ResidentType.OWNER),
         status: z
-            .nativeEnum(ResidentStatus)
+            .enum(ResidentStatus)
             .optional()
             .default(ResidentStatus.ACTIVE),
         moveInDate: z
-            .string()
+            .iso
             .datetime({ message: 'moveInDate must be a valid ISO date' })
             .optional(),
         vehicleNumbers: z
@@ -38,8 +38,8 @@ export const updateResidentSchema = z.object({
     }),
     body: z.object({
         flatId: z.string().min(1).optional(),
-        type: z.nativeEnum(ResidentType).optional(),
-        status: z.nativeEnum(ResidentStatus).optional(),
+        type: z.enum(ResidentType).optional(),
+        status: z.enum(ResidentStatus).optional(),
         moveInDate: z.string().datetime().optional().nullable(),
         moveOutDate: z.string().datetime().optional().nullable(),
         vehicleNumbers: z.array(z.string().trim()).optional(),

@@ -66,7 +66,7 @@ export function tenantScopePlugin(schema: Schema): void {
             );
             logger.error(
                 { model: modelName, method, stack: error.stack },
-                '🚨 Tenant scope violation detected',
+                'Tenant scope violation detected',
             );
             throw error;
         });
@@ -89,7 +89,7 @@ export function tenantScopePlugin(schema: Schema): void {
         const error = new Error(
             `[TENANT VIOLATION] Aggregate on tenant-scoped model executed without tenantId.`,
         );
-        logger.error({ stack: error.stack }, '🚨 Tenant scope violation in aggregate');
+        logger.error({ stack: error.stack }, 'Tenant scope violation in aggregate');
         throw error;
     });
 

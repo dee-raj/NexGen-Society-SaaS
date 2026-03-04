@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { SocietyController } from './society.controller';
-import { validate } from '../../shared/middleware/validate';
-import { authenticate } from '../../shared/middleware/authenticate';
-import { authorize } from '../../shared/middleware/authorize';
-import { Role } from '../../shared/utils/constants';
+import { validate } from '@shared/middleware/validate';
+import { authenticate } from '@shared/middleware/authenticate';
+import { authorize } from '@shared/middleware/authorize';
+import { Role } from '@shared/utils/constants';
 import {
     createSocietySchema,
     updateSocietySchema,
