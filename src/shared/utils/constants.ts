@@ -127,6 +127,80 @@ export enum ExpenseStatus {
     REJECTED = 'rejected',
 }
 
+// ── Procurement Engine ──────────────────────────────────────
+
+export enum ProcurementStatus {
+    DRAFT = 'draft',
+    SUBMITTED = 'submitted',
+    QUOTED = 'quoted',
+    APPROVED = 'approved',
+    PO_ISSUED = 'po_issued',
+    COMPLETED = 'completed',
+    CANCELLED = 'cancelled',
+}
+
+export enum QuoteStatus {
+    PENDING = 'pending',
+    ACCEPTED = 'accepted',
+    REJECTED = 'rejected',
+}
+
+export enum POStatus {
+    ISSUED = 'issued',
+    DELIVERED = 'delivered',
+    CANCELLED = 'cancelled',
+}
+
+export enum CommissionType {
+    PERCENTAGE = 'percentage',
+    FIXED = 'fixed',
+}
+
+// ── Complaint Workflow ──────────────────────────────────────
+
+export enum ComplaintStatus {
+    REPORTED = 'reported',
+    IN_PROGRESS = 'in_progress',
+    RESOLVED = 'resolved',
+    CLOSED = 'closed',
+}
+
+export enum ComplaintPriority {
+    LOW = 'low',
+    MEDIUM = 'medium',
+    HIGH = 'high',
+    URGENT = 'urgent',
+}
+
+export enum ComplaintCategory {
+    PLUMBING = 'plumbing',
+    ELECTRICAL = 'electrical',
+    CIVIL = 'civil',
+    HOUSEKEEPING = 'housekeeping',
+    SECURITY = 'security',
+    PARKING = 'parking',
+    NOISE = 'noise',
+    OTHER = 'other',
+}
+
+// ── Communication Module ────────────────────────────────────
+
+export enum NotificationType {
+    NOTICE = 'notice',
+    COMPLAINT_UPDATE = 'complaint_update',
+    PAYMENT_REMINDER = 'payment_reminder',
+    MAINTENANCE_ALERT = 'maintenance_alert',
+    SYSTEM = 'system',
+    CUSTOM = 'custom',
+}
+
+export enum NotificationChannel {
+    IN_APP = 'in_app',
+    PUSH = 'push',
+    EMAIL = 'email',
+    SMS = 'sms',
+}
+
 /** Pagination defaults */
 export const PAGINATION = {
     DEFAULT_PAGE: 1,

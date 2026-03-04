@@ -2,6 +2,8 @@ import { TenantService } from '@shared/services/tenant.service';
 import { INotice } from './notices.types';
 import { Notice } from './notices.model';
 import { CreateNoticeInput, UpdateNoticeInput } from './notices.validator';
+import { Society } from '@modules/society/society.model';
+import { SocietyStatus } from '@shared/utils/constants';
 
 /**
  * Notices service — extends TenantService for automatic tenant scoping.
@@ -23,7 +25,6 @@ class NoticesServiceClass extends TenantService<INotice> {
             updatedBy: userId as unknown as INotice['updatedBy'],
         };
 
-        // If publishing immediately, set publishedAt
         if (data.isPublished) {
             noticeData.publishedAt = new Date();
         }
@@ -43,12 +44,10 @@ class NoticesServiceClass extends TenantService<INotice> {
             updatedBy: userId,
         };
 
-        // Handle publish state transition
         if (data.isPublished === true) {
             updateData.publishedAt = new Date();
         }
 
-        // Handle expiresAt
         if (data.expiresAt) {
             updateData.expiresAt = new Date(data.expiresAt);
         } else if (data.expiresAt === null) {
@@ -57,6 +56,35 @@ class NoticesServiceClass extends TenantService<INotice> {
         }
 
         return this.updateById(tenantId, id, updateData);
+    }
+
+    /**
+     * SUPER_ADMIN global broadcast — creates an identical notice
+     * for every active society. Uses insertMany for efficiency.
+     */
+    async createGlobalNotice(
+        data: CreateNoticeInput,
+        userId: string,
+    ): Promise<{ created: number }> {
+        const activeSocieties = await Society.find(
+            { status: SocietyStatus.ACTIVE },
+            { _id: 1 },
+        ).lean();
+
+        if (activeSocieties.length === 0) return { created: 0 };
+
+        const docs = activeSocieties.map((s) => ({
+            ...data,
+            societyId: s._id,
+            expiresAt: data.expiresAt ? new Date(data.expiresAt) : undefined,
+            isPublished: data.isPublished ?? true,
+            publishedAt: data.isPublished !== false ? new Date() : undefined,
+            createdBy: userId,
+            updatedBy: userId,
+        }));
+
+        await Notice.insertMany(docs);
+        return { created: docs.length };
     }
 }
 

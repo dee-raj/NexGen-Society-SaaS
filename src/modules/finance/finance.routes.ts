@@ -66,4 +66,4 @@ router.patch(
     FinanceController.updateExpenseStatus,
 );
 
-export const financeRoutes = router;
+export default router;

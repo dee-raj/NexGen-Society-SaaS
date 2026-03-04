@@ -16,6 +16,7 @@ import {
 } from '@shared/utils/constants';
 import { tenantScopePlugin } from '@shared/plugins/tenant-scope.plugin';
 import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
+import { BadRequestError } from '@shared/utils/api-error';
 
 const transformJSON = {
     transform(_doc: any, ret: Record<string, unknown>) {
@@ -152,7 +153,7 @@ invoiceSchema.pre('save', function () {
         const original = locals.originalDocument;
         if (original && (original.status === InvoiceStatus.PAID || original.status === InvoiceStatus.CANCELLED)) {
             // Cannot modify a paid or cancelled invoice (exceptions could be added if needed)
-            throw new Error('Cannot modify a paid or cancelled invoice');
+            throw new BadRequestError('Cannot modify a paid or cancelled invoice');
         }
     }
 });
@@ -242,7 +243,7 @@ const ledgerEntrySchema = new Schema<ILedgerEntry>(
         },
         referenceType: {
             type: String,
-            enum: ['Invoice', 'Payment', 'Expense', 'Manual'],
+            enum: ['Invoice', 'Payment', 'Expense', 'PurchaseOrder', 'Manual'],
             required: true,
         },
         referenceId: {
@@ -268,18 +269,18 @@ ledgerEntrySchema.plugin(tenantScopePlugin);
 // Pre-save hook to enforce immutability
 ledgerEntrySchema.pre('save', function () {
     if (!this.isNew) {
-        throw new Error('LedgerEntry is immutable and cannot be updated.');
+        throw new BadRequestError('LedgerEntry is immutable and cannot be updated.');
     }
 });
 
 // Disable update methods entirely for this schema (append-only ledger constraint)
 ledgerEntrySchema.pre(/update|updateOne|updateMany|findOneAndUpdate/, function () {
-    throw new Error('Updating a LedgerEntry is strictly prohibited. Use compensatory transactions instead.');
+    throw new BadRequestError('Updating a LedgerEntry is strictly prohibited. Use compensatory transactions instead.');
 });
 
 // Disable delete methods entirely
 ledgerEntrySchema.pre(/deleteOne|deleteMany|findOneAndDelete|remove/, function () {
-    throw new Error('Deleting a LedgerEntry is strictly prohibited. Use compensatory transactions instead.');
+    throw new BadRequestError('Deleting a LedgerEntry is strictly prohibited. Use compensatory transactions instead.');
 });
 
 ledgerEntrySchema.index({ societyId: 1, date: -1 });

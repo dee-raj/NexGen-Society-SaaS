@@ -17,7 +17,7 @@ export const createFlatSchema = z.object({
             .min(-5)
             .max(200),
         type: z
-            .nativeEnum(FlatType)
+            .enum(FlatType)
             .optional()
             .default(FlatType.APARTMENT),
         area: z
@@ -38,7 +38,7 @@ export const updateFlatSchema = z.object({
     body: z.object({
         unitNumber: z.string().min(1).max(20).trim().optional(),
         floor: z.number().int().min(-5).max(200).optional(),
-        type: z.nativeEnum(FlatType).optional(),
+        type: z.enum(FlatType).optional(),
         area: z.number().positive().optional().nullable(),
         isOccupied: z.boolean().optional(),
     }).strict(),

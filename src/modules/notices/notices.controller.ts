@@ -103,4 +103,18 @@ export class NoticesController {
 
         ApiResponse.success(res, { message: 'Notice deleted successfully' });
     });
+
+    /**
+     * POST /notices/broadcast
+     * SUPER_ADMIN — creates an identical notice across all active societies.
+     */
+    static broadcastGlobal = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        if (!req.user) {
+            throw new BadRequestError('Authentication required');
+        }
+
+        const result = await NoticesService.createGlobalNotice(req.body, req.user.userId);
+        ApiResponse.created(res, result);
+    });
 }
+

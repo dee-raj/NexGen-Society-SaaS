@@ -14,7 +14,7 @@ import {
     ResidentStatus,
     CalculationMethod,
 } from '@shared/utils/constants';
-import { NotFoundError } from '@shared/utils/api-error';
+import { NotFoundError, BadRequestError } from '@shared/utils/api-error';
 
 export class FinanceService {
     /**
@@ -74,7 +74,7 @@ export class FinanceService {
                     amount = template.amountOrRate;
                 } else if (template.calculationMethod === CalculationMethod.PER_SQFT) {
                     if (!flat.area) {
-                        throw new Error(`Flat ${flat.unitNumber} does not have an area defined for PER_SQFT calculation`);
+                        throw new BadRequestError(`Flat ${flat.unitNumber} does not have an area defined for PER_SQFT calculation`);
                     }
                     amount = template.amountOrRate * flat.area;
                 }
@@ -154,21 +154,21 @@ export class FinanceService {
                 .setOptions({ tenantId: societyId });
 
             if (!invoice) {
-                throw new Error('Invoice not found');
+                throw new NotFoundError('Invoice not found');
             }
 
             if (invoice.status === InvoiceStatus.PAID) {
-                throw new Error('Invoice is already fully paid');
+                throw new BadRequestError('Invoice is already fully paid');
             }
 
             if (invoice.status === InvoiceStatus.CANCELLED) {
-                throw new Error('Invoice is cancelled');
+                throw new BadRequestError('Invoice is cancelled');
             }
 
             const remainingAmount = invoice.totalAmount - invoice.amountPaid;
 
             if (amount > remainingAmount) {
-                throw new Error(`Payment amount (${amount}) exceeds remaining due (${remainingAmount})`);
+                throw new BadRequestError(`Payment amount (${amount}) exceeds remaining due (${remainingAmount})`);
             }
 
             // Create Payment Record

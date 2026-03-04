@@ -13,7 +13,7 @@ export const createNoticeSchema = z.object({
             .min(10, 'Content must be at least 10 characters')
             .max(5000, 'Content must not exceed 5000 characters'),
         priority: z
-            .nativeEnum(NoticePriority)
+            .enum(NoticePriority)
             .optional()
             .default(NoticePriority.MEDIUM),
         isPublished: z
@@ -44,7 +44,7 @@ export const updateNoticeSchema = z.object({
             .max(5000, 'Content must not exceed 5000 characters')
             .optional(),
         priority: z
-            .nativeEnum(NoticePriority)
+            .enum(NoticePriority)
             .optional(),
         isPublished: z
             .boolean()

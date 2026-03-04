@@ -31,7 +31,7 @@ export const createSocietySchema = z.object({
             .string({ message: 'Pincode is required' })
             .regex(/^\d{4,10}$/, 'Pincode must be 4-10 digits'),
         status: z
-            .nativeEnum(SocietyStatus)
+            .enum(SocietyStatus)
             .optional()
             .default(SocietyStatus.ONBOARDING),
         contactEmail: z
@@ -60,7 +60,7 @@ export const updateSocietySchema = z.object({
         city: z.string().min(2).max(100).trim().optional(),
         state: z.string().min(2).max(100).trim().optional(),
         pincode: z.string().regex(/^\d{4,10}$/, 'Pincode must be 4-10 digits').optional(),
-        status: z.nativeEnum(SocietyStatus).optional(),
+        status: z.enum(SocietyStatus).optional(),
         contactEmail: z.string().email().optional().nullable(),
         contactPhone: z.string().regex(/^\+?[\d\s-]{10,15}$/).optional().nullable(),
         logoUrl: z.string().url().optional().nullable(),

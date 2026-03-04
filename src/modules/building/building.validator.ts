@@ -9,7 +9,7 @@ export const createBuildingSchema = z.object({
             .max(100, 'Name must not exceed 100 characters')
             .trim(),
         type: z
-            .nativeEnum(BuildingType)
+            .enum(BuildingType)
             .optional()
             .default(BuildingType.RESIDENTIAL),
         totalFloors: z
@@ -31,7 +31,7 @@ export const updateBuildingSchema = z.object({
     }),
     body: z.object({
         name: z.string().min(1).max(100).trim().optional(),
-        type: z.nativeEnum(BuildingType).optional(),
+        type: z.enum(BuildingType).optional(),
         totalFloors: z.number().int().min(1).max(200).optional(),
         description: z.string().max(500).trim().optional().nullable(),
     }).strict(),

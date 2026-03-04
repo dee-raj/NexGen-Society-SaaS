@@ -46,4 +46,16 @@ router.delete(
     NoticesController.delete,
 );
 
+// ── Super Admin global broadcast ──────────────────────────
+// Note: authenticate is already applied via router.use above.
+// tenantContext is present but SUPER_ADMIN may have no societyId —
+// the service queries Society directly using globalOptions.
+router.post(
+    '/broadcast',
+    authorize(Role.SUPER_ADMIN),
+    validate(createNoticeSchema),
+    NoticesController.broadcastGlobal,
+);
+
 export default router;
+
