@@ -19,7 +19,7 @@ declare global {
             };
 
             /** Tenant context — attached by tenant-context middleware */
-            tenantId?: string;
+            tenantId?: string | null;
         }
     }
 }

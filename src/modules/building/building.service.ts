@@ -12,10 +12,10 @@ class BuildingServiceClass extends TenantService<IBuilding> {
         super(Building);
     }
 
-    async createBuilding(tenantId: string, data: CreateBuildingInput, userId: string): Promise<IBuilding> {
-        // Check for duplicate name
-        if (data.name) {
-            const existing = await Building.findOne({ name: data.name, societyId: tenantId });
+    async createBuilding(tenantId: string | null, data: CreateBuildingInput, userId: string): Promise<IBuilding> {
+        // Check for duplicate name within the same society (if scoped)
+        if (data.name && tenantId) {
+            const existing = await Building.findOne({ name: data.name, societyId: tenantId }).setOptions({ tenantId });
             if (existing) {
                 throw new ConflictError('Building with this name already exists');
             }
@@ -28,13 +28,13 @@ class BuildingServiceClass extends TenantService<IBuilding> {
     }
 
     async updateBuilding(
-        tenantId: string,
+        tenantId: string | null,
         id: string,
         data: UpdateBuildingInput,
         userId: string,
     ): Promise<IBuilding | null> {
-        // Check for duplicate name
-        if (data.name) {
+        // Check for duplicate name (if scoped)
+        if (data.name && tenantId) {
             const existing = await Building.findOne({ name: data.name, societyId: tenantId, _id: { $ne: id } });
             if (existing) {
                 throw new ConflictError('Building with this name already exists');

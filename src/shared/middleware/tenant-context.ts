@@ -18,13 +18,13 @@ export const tenantContext = (req: Request, _res: Response, next: NextFunction):
 
     // SUPER_ADMIN can operate cross-tenant
     if (req.user.role === Role.SUPER_ADMIN) {
-        // Allow optional scoping via header or query param
         const requestedTenant =
             (req.headers['x-tenant-id'] as string) ||
             (req.query.societyId as string) ||
             req.user.societyId;
 
-        req.tenantId = requestedTenant;
+        // Explicitly set to null if no specific tenant is requested, signaling GLOBAL context
+        req.tenantId = requestedTenant || null;
         return next();
     }
 

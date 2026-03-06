@@ -5,7 +5,10 @@ import { StaffType, StaffDepartment, StaffStatus } from '@shared/utils/constants
 export interface IStaff extends Document {
     _id: Types.ObjectId;
     societyId: Types.ObjectId;
-    userId: Types.ObjectId;
+    fullName: string;
+    profilePic?: string;
+    email: string;
+    phoneNumber: string;
     type: StaffType;
     department: StaffDepartment;
     status: StaffStatus;

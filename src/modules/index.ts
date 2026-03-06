@@ -12,6 +12,7 @@ import complaintRoutes from './complaint/complaint.routes';
 import notificationRoutes from './notification/notification.routes';
 import analyticsRoutes from './analytics/analytics.routes';
 import staffRoutes from './staff/staff.routes';
+import { societyRequestRoutes } from './society-request/society-request.routes';
 
 const rootRouter = Router();
 
@@ -27,5 +28,6 @@ rootRouter.use("/complaints", complaintRoutes);
 rootRouter.use("/notifications", notificationRoutes);
 rootRouter.use("/analytics", analyticsRoutes);
 rootRouter.use("/staff", staffRoutes);
+rootRouter.use("/society-requests", societyRequestRoutes);
 
 export default rootRouter;

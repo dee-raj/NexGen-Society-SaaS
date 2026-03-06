@@ -6,11 +6,23 @@ import { auditLogPlugin } from '@shared/plugins/audit-log.plugin';
 
 const staffSchema = new Schema<IStaff>(
     {
-        userId: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
+        fullName: {
+            type: String,
             required: true,
-            index: true,
+            trim: true,
+        },
+        profilePic: {
+            type: String,
+            trim: true,
+        },
+        email: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        phoneNumber: {
+            type: String,
+            required: true,
         },
         type: {
             type: String,
@@ -62,7 +74,6 @@ staffSchema.plugin(tenantScopePlugin);
 staffSchema.plugin(auditLogPlugin);
 
 // ── Indexes ──────────────────────────────────────────────
-staffSchema.index({ societyId: 1, userId: 1 });
 staffSchema.index({ societyId: 1, department: 1 });
 staffSchema.index({ societyId: 1, status: 1 });
 

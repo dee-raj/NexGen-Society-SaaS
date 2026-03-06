@@ -21,7 +21,10 @@ export abstract class TenantService<T extends Document> {
     // ── Option Builders ──────────────────────────────────────
 
     /** Build query options with tenant scoping */
-    protected tenantOptions(tenantId: string, extra?: Record<string, unknown>): Record<string, unknown> {
+    protected tenantOptions(tenantId: string | null, extra?: Record<string, unknown>): Record<string, unknown> {
+        if (tenantId === null) {
+            return { ...extra, skipTenantCheck: true };
+        }
         return { ...extra, tenantId };
     }
 
@@ -34,7 +37,7 @@ export abstract class TenantService<T extends Document> {
 
     /** Find all documents within a tenant */
     async findAll(
-        tenantId: string,
+        tenantId: string | null,
         filter: Record<string, unknown> = {},
         page = 1,
         limit = 20,
@@ -55,7 +58,7 @@ export abstract class TenantService<T extends Document> {
     }
 
     /** Find a single document by ID within a tenant */
-    async findById(tenantId: string, id: string): Promise<T | null> {
+    async findById(tenantId: string | null, id: string): Promise<T | null> {
         if (!Types.ObjectId.isValid(id)) return null;
         return this.model.findOne(
             { _id: id },
@@ -65,7 +68,11 @@ export abstract class TenantService<T extends Document> {
     }
 
     /** Create a new document, auto-injecting societyId */
-    async create(tenantId: string, data: Partial<T>): Promise<T> {
+    async create(tenantId: string | null, data: Partial<T>): Promise<T> {
+        // Creation always requires a tenant context unless explicitly handled otherwise
+        if (!tenantId) {
+            throw new Error('[TENANT VIOLATION] Cannot create tenant-scoped document without valid tenantId');
+        }
         return this.model.create({
             ...data,
             societyId: tenantId,
@@ -74,7 +81,7 @@ export abstract class TenantService<T extends Document> {
 
     /** Update a document by ID within a tenant */
     async updateById(
-        tenantId: string,
+        tenantId: string | null,
         id: string,
         data: UpdateQuery<T>,
     ): Promise<T | null> {
@@ -91,7 +98,7 @@ export abstract class TenantService<T extends Document> {
     }
 
     /** Delete a document by ID within a tenant */
-    async deleteById(tenantId: string, id: string): Promise<T | null> {
+    async deleteById(tenantId: string | null, id: string): Promise<T | null> {
         if (!Types.ObjectId.isValid(id)) return null;
         return this.model.findOneAndDelete(
             { _id: id },
@@ -100,7 +107,7 @@ export abstract class TenantService<T extends Document> {
     }
 
     /** Count documents within a tenant */
-    async count(tenantId: string, filter: Record<string, unknown> = {}): Promise<number> {
+    async count(tenantId: string | null, filter: Record<string, unknown> = {}): Promise<number> {
         return this.model.countDocuments(filter, this.tenantOptions(tenantId));
     }
 

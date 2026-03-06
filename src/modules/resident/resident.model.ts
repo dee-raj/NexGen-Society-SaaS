@@ -9,8 +9,25 @@ const residentSchema = new Schema<IResident>(
         userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
             index: true,
+        },
+        fullName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        email: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        phoneNumber: {
+            type: String,
+            required: true,
+        },
+        profilePic: {
+            type: String,
+            trim: true,
         },
         flatId: {
             type: Schema.Types.ObjectId,

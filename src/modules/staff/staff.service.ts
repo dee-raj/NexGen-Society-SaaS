@@ -9,21 +9,19 @@ class StaffServiceClass extends TenantService<IStaff> {
         super(Staff);
     }
 
-    async createStaff(tenantId: string, data: CreateStaffInput, actionUserId: string): Promise<IStaff> {
+    async createStaff(tenantId: string | null, data: CreateStaffInput, actionUserId: string): Promise<IStaff> {
         const objectActionUserId = new Types.ObjectId(actionUserId);
-        const objectTargetUserId = new Types.ObjectId(data.userId);
 
         return this.create(tenantId, {
             ...data,
             joinedAt: data.joinedAt ? new Date(data.joinedAt) : undefined,
             createdBy: objectActionUserId as unknown as IStaff['createdBy'],
             updatedBy: objectActionUserId as unknown as IStaff['updatedBy'],
-            userId: objectTargetUserId as unknown as IStaff['userId'],
         });
     }
 
     async updateStaff(
-        tenantId: string,
+        tenantId: string | null,
         id: string,
         data: UpdateStaffInput,
         actionUserId: string,

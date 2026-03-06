@@ -43,3 +43,21 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction): 
         return next(new UnauthorizedError('Invalid access token'));
     }
 };
+
+/**
+ * Authorizes a request based on the user's role.
+ * Must run AFTER authenticate middleware.
+ */
+export const authorize = (allowedRoles: Role[]) => {
+    return (req: Request, _res: Response, next: NextFunction): void => {
+        if (!req.user) {
+            return next(new UnauthorizedError('Authentication required before authorization'));
+        }
+
+        if (!allowedRoles.includes(req.user.role)) {
+            return next(new UnauthorizedError(`Role ${req.user.role} is not authorized to access this resource`));
+        }
+
+        next();
+    };
+};

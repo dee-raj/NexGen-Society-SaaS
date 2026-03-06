@@ -3,9 +3,21 @@ import { StaffType, StaffDepartment, StaffStatus } from '@shared/utils/constants
 
 export const createStaffSchema = z.object({
     body: z.object({
-        userId: z
-            .string({ message: 'User ID is required' })
-            .min(1, 'User ID is required'),
+        fullName: z
+            .string({ message: 'Full name is required' })
+            .min(1, 'Full name is required'),
+        profilePic: z
+            .string()
+            .trim()
+            .optional(),
+        email: z
+            .email({ message: 'Invalid email address' })
+            .optional(),
+        phoneNumber: z
+            .string()
+            .min(10, 'Phone number must be at least 10 digits')
+            .max(15, 'Phone number must be at most 15 digits')
+            .optional(),
         type: z
             .enum(StaffType)
             .optional()

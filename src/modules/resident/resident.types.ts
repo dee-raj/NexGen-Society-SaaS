@@ -5,8 +5,12 @@ import { ResidentType, ResidentStatus } from '@shared/utils/constants';
 export interface IResident extends Document {
     _id: Types.ObjectId;
     societyId: Types.ObjectId;
-    userId: Types.ObjectId;
+    userId?: Types.ObjectId;
     flatId: Types.ObjectId;
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    profilePic?: string;
     type: ResidentType;
     status: ResidentStatus;
     moveInDate?: Date;

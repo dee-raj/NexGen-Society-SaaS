@@ -12,9 +12,9 @@ class ResidentServiceClass extends TenantService<IResident> {
         super(Resident);
     }
 
-    async createResident(tenantId: string, data: CreateResidentInput, userId: string): Promise<IResident> {
+    async createResident(tenantId: string, data: any, userId: string): Promise<IResident> {
         const objectActionUserId = new Types.ObjectId(userId);
-        const objectTargetUserId = new Types.ObjectId(data.userId);
+        const objectTargetUserId = data.userId ? new Types.ObjectId(data.userId) : undefined;
         const objectFlatId = new Types.ObjectId(data.flatId);
 
         return this.create(tenantId, {

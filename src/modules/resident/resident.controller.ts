@@ -17,6 +17,7 @@ export class ResidentController {
         if (status) filter.status = status;
 
         const { data, total } = await ResidentService.findAll(req.tenantId, filter, page, limit);
+        console.log({ data });
         ApiResponse.paginated(res, data, total, page, limit);
     });
 

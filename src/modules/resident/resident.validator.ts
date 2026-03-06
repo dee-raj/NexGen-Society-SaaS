@@ -4,8 +4,22 @@ import { ResidentType, ResidentStatus } from '@shared/utils/constants';
 export const createResidentSchema = z.object({
     body: z.object({
         userId: z
-            .string({ message: 'User ID is required' })
-            .min(1, 'User ID is required'),
+            .string()
+            .min(1, 'User ID must be valid')
+            .optional(),
+        fullName: z
+            .string({ message: 'Full name is required' })
+            .min(1, 'Full name is required'),
+        email: z
+            .string({ message: 'Email is required' })
+            .email('Invalid email address'),
+        phoneNumber: z
+            .string({ message: 'Phone number is required' })
+            .min(10, 'Phone number must be at least 10 digits')
+            .max(15, 'Phone number must be at most 15 digits'),
+        profilePic: z
+            .string()
+            .optional(),
         flatId: z
             .string({ message: 'Flat ID is required' })
             .min(1, 'Flat ID is required'),

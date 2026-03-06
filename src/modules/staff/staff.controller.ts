@@ -6,7 +6,7 @@ import { BadRequestError, NotFoundError } from '@shared/utils/api-error';
 
 export class StaffController {
     static getAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        if (!req.tenantId) throw new BadRequestError('Tenant context is required');
+        if (req.tenantId === undefined) throw new BadRequestError('Tenant context is required');
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 20;
         const department = req.query.department as string | undefined;
@@ -21,27 +21,27 @@ export class StaffController {
     });
 
     static getById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        if (!req.tenantId) throw new BadRequestError('Tenant context is required');
+        if (req.tenantId === undefined) throw new BadRequestError('Tenant context is required');
         const staff = await StaffService.findById(req.tenantId, req.params.id as string);
         if (!staff) throw new NotFoundError('Staff');
         ApiResponse.success(res, staff);
     });
 
     static create = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        if (!req.tenantId || !req.user) throw new BadRequestError('Tenant context and authentication required');
+        if (req.tenantId === undefined || !req.user) throw new BadRequestError('Tenant context and authentication required');
         const staff = await StaffService.createStaff(req.tenantId, req.body, req.user.userId);
         ApiResponse.created(res, staff);
     });
 
     static update = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        if (!req.tenantId || !req.user) throw new BadRequestError('Tenant context and authentication required');
+        if (req.tenantId === undefined || !req.user) throw new BadRequestError('Tenant context and authentication required');
         const staff = await StaffService.updateStaff(req.tenantId, req.params.id as string, req.body, req.user.userId);
         if (!staff) throw new NotFoundError('Staff');
         ApiResponse.success(res, staff);
     });
 
     static delete = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-        if (!req.tenantId) throw new BadRequestError('Tenant context is required');
+        if (req.tenantId === undefined) throw new BadRequestError('Tenant context is required');
         const staff = await StaffService.deleteById(req.tenantId, req.params.id as string);
         if (!staff) throw new NotFoundError('Staff');
         ApiResponse.success(res, { message: 'Staff deleted successfully' });
