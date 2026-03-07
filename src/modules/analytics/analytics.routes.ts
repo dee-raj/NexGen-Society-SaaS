@@ -7,20 +7,31 @@ import { Role } from '@shared/utils/constants';
 const router = Router();
 
 /**
- * All analytics routes: authenticate → authorize(SUPER_ADMIN).
- * No tenantContext middleware — these are cross-tenant queries.
+ * Super Admin dashboard — cross-tenant metrics.
  */
-router.use(authenticate, authorize(Role.SUPER_ADMIN));
+router.get(
+    '/platform-dashboard',
+    authenticate,
+    authorize(Role.SUPER_ADMIN),
+    AnalyticsController.getPlatformDashboard
+);
 
-// ── Full dashboard (all metrics in one round-trip) ────────
-router.get('/dashboard', AnalyticsController.getDashboard);
+/**
+ * Society Admin dashboard — tenant-scoped metrics.
+ */
+router.get(
+    '/society-dashboard',
+    authenticate,
+    authorize(Role.SOCIETY_ADMIN),
+    AnalyticsController.getSocietyDashboard
+);
 
-// ── Individual metric endpoints ───────────────────────────
-router.get('/societies', AnalyticsController.getSocieties);
-router.get('/residents', AnalyticsController.getResidents);
-router.get('/outstanding-dues', AnalyticsController.getOutstandingDues);
-router.get('/commission', AnalyticsController.getCommission);
-router.get('/monthly-earnings', AnalyticsController.getMonthlyEarnings);
-router.get('/vendor-performance', AnalyticsController.getVendorPerformance);
+// ── Individual Super Admin metrics ───────────────────────────
+router.get('/societies', authenticate, authorize(Role.SUPER_ADMIN), AnalyticsController.getSocieties);
+router.get('/residents', authenticate, authorize(Role.SUPER_ADMIN), AnalyticsController.getResidents);
+router.get('/outstanding-dues', authenticate, authorize(Role.SUPER_ADMIN), AnalyticsController.getOutstandingDues);
+router.get('/commission', authenticate, authorize(Role.SUPER_ADMIN), AnalyticsController.getCommission);
+router.get('/monthly-earnings', authenticate, authorize(Role.SUPER_ADMIN), AnalyticsController.getMonthlyEarnings);
+router.get('/vendor-performance', authenticate, authorize(Role.SUPER_ADMIN), AnalyticsController.getVendorPerformance);
 
 export default router;

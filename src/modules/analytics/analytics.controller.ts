@@ -2,19 +2,30 @@ import { Request, Response } from 'express';
 import { AnalyticsService } from './analytics.service';
 import { ApiResponse } from '@shared/utils/api-response';
 import { asyncHandler } from '@shared/utils/async-handler';
+import { BadRequestError } from '@shared/utils/api-error';
 
 /**
- * Super Admin analytics controller.
- * All endpoints require authenticate → authorize(SUPER_ADMIN).
- * No tenant scoping — reads across all societies.
+ * Analytics controller for platform/society metrics.
  */
 export class AnalyticsController {
     /**
-     * GET /analytics/dashboard
-     * Complete platform dashboard — all 6 metrics in one call.
+     * GET /analytics/platform-dashboard
+     * Super Admin cross-tenant platform dashboard.
      */
-    static getDashboard = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
+    static getPlatformDashboard = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
         const dashboard = await AnalyticsService.getPlatformDashboard();
+        ApiResponse.success(res, dashboard);
+    });
+
+    /**
+     * GET /analytics/society-dashboard
+     * Society Admin tenant-scoped dashboard.
+     */
+    static getSocietyDashboard = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        if (!req.user?.societyId) {
+            throw new BadRequestError('Society context required');
+        }
+        const dashboard = await AnalyticsService.getSocietyDashboard(req.user.societyId);
         ApiResponse.success(res, dashboard);
     });
 

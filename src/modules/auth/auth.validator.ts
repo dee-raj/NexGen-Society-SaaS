@@ -45,6 +45,38 @@ export const loginSchema = z.object({
     }).strict(),
 });
 
+export const updateProfileSchema = z.object({
+    body: z.object({
+        email: z
+            .string({ message: 'Email is required' })
+            .trim()
+            .toLowerCase()
+            .email('Invalid email format'),
+        fullName: z
+            .string({ message: 'Full name is required' })
+            .min(2, 'Name must be at least 2 characters')
+            .max(100, 'Name must not exceed 100 characters')
+            .trim(),
+        phoneNumber: z
+            .string()
+            .regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number')
+            .optional(),
+    }).strict(),
+});
+
+export const changePasswordSchema = z.object({
+    body: z.object({
+        newPassword: z
+            .string({ message: 'New password is required' })
+            .min(8, 'New password must be at least 8 characters')
+            .max(72, 'New password must not exceed 72 characters')
+            .regex(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+                'Password must contain uppercase, lowercase, number, and special character',
+            ),
+    }).strict(),
+});
+
 export const refreshTokenSchema = z.object({
     body: z.object({
         refreshToken: z
@@ -53,6 +85,34 @@ export const refreshTokenSchema = z.object({
     }).strict(),
 });
 
+export const forgotPasswordSchema = z.object({
+    body: z.object({
+        email: z
+            .string({ message: 'Email is required' })
+            .trim()
+            .toLowerCase()
+            .email('Invalid email format'),
+    }).strict(),
+});
+
+export const resetPasswordSchema = z.object({
+    body: z.object({
+        token: z.string({ message: 'Reset token is required' }),
+        newPassword: z
+            .string({ message: 'New password is required' })
+            .min(8, 'New password must be at least 8 characters')
+            .max(72, 'New password must not exceed 72 characters')
+            .regex(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+                'Password must contain uppercase, lowercase, number, and special character',
+            ),
+    }).strict(),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>['body'];
 export type LoginInput = z.infer<typeof loginSchema>['body'];
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>['body'];
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>['body'];
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>['body'];
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>['body'];

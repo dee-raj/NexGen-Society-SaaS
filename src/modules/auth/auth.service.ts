@@ -12,7 +12,8 @@ import {
     RefreshTokenPayload,
     IUser,
 } from './auth.types';
-import { RegisterInput, LoginInput } from './auth.validator';
+import { RegisterInput, LoginInput, UpdateProfileInput } from './auth.validator';
+import { EmailService } from '@shared/services/email.service';
 import {
     ConflictError,
     UnauthorizedError,
@@ -62,6 +63,7 @@ function buildAuthResponse(user: IUser, tokens: AuthTokens): AuthResponse {
             email: user.email,
             fullName: user.fullName,
             role: user.role,
+            phone: user.phone,
             ...(user.societyId && { societyId: user.societyId.toString() }),
         },
         tokens,
@@ -258,5 +260,73 @@ export class AuthService {
         });
 
         return { accessToken, refreshToken };
+    }
+
+    static async changePassword(userId: string, password: string): Promise<void> {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new BadRequestError('User not found');
+        }
+        user.password = password;
+        await user.save();
+    }
+
+    static async updateProfile(userId: string, input: UpdateProfileInput): Promise<IUser> {
+        const updatedUser = await User.findByIdAndUpdate(userId, {
+            email: input.email,
+            phone: input.phoneNumber,
+            fullName: input.fullName,
+        }, {
+            new: true,
+            runValidators: true,
+        }).select('-password');
+
+        if (!updatedUser) {
+            throw new BadRequestError('User not found');
+        }
+
+        return updatedUser;
+    }
+
+    static async forgotPassword(email: string): Promise<void> {
+        const user = await User.findOne({ email });
+        if (!user) {
+            // Silently return to prevent account enumeration
+            logger.warn({ email }, 'Forgot password requested for non-existent email');
+            return;
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        user.passwordResetToken = hashedToken;
+        user.passwordResetExpires = new Date(Date.now() + 3600000); // 1 hour
+
+        await user.save();
+
+        // Send reset email
+        const resetUrl = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
+        await EmailService.sendPasswordResetEmail(user.email, resetUrl);
+    }
+
+    static async resetPassword(token: string, newPassword: string): Promise<void> {
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        const user = await User.findOne({
+            passwordResetToken: hashedToken,
+            passwordResetExpires: { $gt: Date.now() },
+        }).select('+passwordResetToken +passwordResetExpires');
+
+        if (!user) {
+            throw new BadRequestError('Reset token is invalid or has expired');
+        }
+
+        user.password = newPassword;
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+
+        await user.save();
+        logger.info({ userId: user._id }, 'Password reset successfully');
     }
 }

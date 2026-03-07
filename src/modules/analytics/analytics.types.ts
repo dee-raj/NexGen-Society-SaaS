@@ -8,6 +8,16 @@ export interface SocietySummary {
     byStatus: Record<string, number>;
 }
 
+/** Society registration request counts */
+export interface RequestSummary {
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+    last7Days: number;
+    last30Days: number;
+}
+
 /** Platform-wide resident headcount */
 export interface ResidentSummary {
     activeResidents: number;
@@ -34,6 +44,12 @@ export interface MonthlyEarning {
     commissionCount: number;
 }
 
+/** Society growth over time */
+export interface SocietyGrowth {
+    date: string;
+    count: number;
+}
+
 /** Vendor performance — PO volume + average vendor rating */
 export interface VendorPerformance {
     vendorId: string;
@@ -47,9 +63,43 @@ export interface VendorPerformance {
 /** Full platform dashboard payload */
 export interface PlatformDashboard {
     societies: SocietySummary;
+    requests: RequestSummary;
     residents: ResidentSummary;
     outstandingDues: OutstandingDues;
     commission: CommissionSummary;
     monthlyEarnings: MonthlyEarning[];
+    societyGrowth: SocietyGrowth[];
     topVendors: VendorPerformance[];
+}
+
+// ─────────────────────────────────────────────────────────────
+// Analytics response types — Society Admin dashboard
+// ─────────────────────────────────────────────────────────────
+
+export interface BuildingDistribution {
+    buildingName: string;
+    residentCount: number;
+    flatCount: number;
+}
+
+export interface StaffDistribution {
+    category: string;
+    count: number;
+}
+
+export interface OccupancyStats {
+    occupied: number;
+    vacant: number;
+    total: number;
+}
+
+/** Single society dashboard payload */
+export interface SocietyDashboard {
+    totalResidents: number;
+    totalStaff: number;
+    totalBuildings: number;
+    totalFlats: number;
+    buildings: BuildingDistribution[];
+    staffDistribution: StaffDistribution[];
+    occupancy: OccupancyStats;
 }

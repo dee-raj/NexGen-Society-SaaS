@@ -7,11 +7,13 @@ export interface IUser extends Document {
     email: string;
     password: string;
     fullName: string;
-    phone?: string;
+    phone: string;
     role: Role;
     societyId?: Types.ObjectId;
     isActive: boolean;
     lastLoginAt?: Date;
+    passwordResetToken?: string;
+    passwordResetExpires?: Date;
     createdAt: Date;
     updatedAt: Date;
 
@@ -58,6 +60,7 @@ export interface AuthResponse {
         fullName: string;
         role: Role;
         societyId?: string;
+        phone: string;
     };
     tokens: AuthTokens;
 }

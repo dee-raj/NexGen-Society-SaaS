@@ -50,6 +50,14 @@ const userSchema = new Schema<IUser>(
         lastLoginAt: {
             type: Date,
         },
+        passwordResetToken: {
+            type: String,
+            select: false,
+        },
+        passwordResetExpires: {
+            type: Date,
+            select: false,
+        },
     },
     {
         timestamps: true,

@@ -90,4 +90,48 @@ export class AuthController {
             createdAt: user.createdAt,
         });
     });
+
+    static updateProfile = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        if (!req.user) {
+            throw new BadRequestError('Authentication required');
+        }
+        const result = await AuthService.updateProfile(req.user.userId, req.body);
+
+        ApiResponse.success(res, {
+            id: result._id.toString(),
+            email: result.email,
+            fullName: result.fullName,
+            phone: result.phone,
+            role: result.role,
+        });
+    });
+
+    // changePassword
+    static changePassword = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        if (!req.user) {
+            throw new BadRequestError('Authentication required');
+        }
+        const result = await AuthService.changePassword(req.user.userId, req.body.newPassword);
+        ApiResponse.success(res, result);
+    });
+
+    /**
+     * POST /auth/forgot-password
+     * Body: { email }
+     */
+    static forgotPassword = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const { email } = req.body;
+        await AuthService.forgotPassword(email);
+        ApiResponse.success(res, { message: 'If an account exists with that email, a reset link has been sent.' });
+    });
+
+    /**
+     * POST /auth/reset-password
+     * Body: { token, newPassword }
+     */
+    static resetPassword = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+        const { token, newPassword } = req.body;
+        await AuthService.resetPassword(token, newPassword);
+        ApiResponse.success(res, { message: 'Password has been reset successfully. Please log in with your new password.' });
+    });
 }
