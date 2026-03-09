@@ -43,6 +43,9 @@ export const createSocietyRequestSchema = z.object({
         adminPhone: z
             .string({ message: 'Admin phone is required' })
             .regex(/^\+?[\d\s-]{10,15}$/, 'Invalid phone number'),
+        agreedToTerms: z
+            .boolean()
+            .refine(val => val === true, 'You must agree to the terms and conditions'),
     }).strict(),
 });
 

@@ -10,6 +10,7 @@
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "eslint src/ --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
+    "create:super-admin": "node ./dist/shared/scripts/createSuperAdmin.js",
     "seed": "tsx src/seeds/index.ts"
   },
   "keywords": [

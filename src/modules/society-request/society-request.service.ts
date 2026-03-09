@@ -6,6 +6,7 @@ import { SocietyRequest } from './society-request.model';
 import { ISocietyRequest, SocietyRequestStatus } from './society-request.types';
 import { ConflictError, NotFoundError, BadRequestError } from '@shared/utils/api-error';
 import { CreateSocietyRequestInput } from './society-request.validator';
+import { EmailService } from '@shared/services/email.service';
 
 class SocietyRequestServiceClass {
     /** Submit a new society registration request (Public) */
@@ -89,7 +90,13 @@ class SocietyRequestServiceClass {
                 adminId: adminUser[0]._id
             }, 'Society request approved and provisioned');
 
-            // TODO: In a real app, send email with tempPassword to the adminEmail here
+            // Send welcome email to admin
+            await EmailService.sendSocietyApprovedEmail(
+                request.adminEmail,
+                request.societyName,
+                request.adminName,
+                tempPassword
+            );
             return request;
         } catch (error) {
             logger.error({ requestId: id, error }, 'Failed to approve society request');

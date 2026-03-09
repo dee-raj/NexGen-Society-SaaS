@@ -72,7 +72,7 @@ export class EmailService {
         email: string,
         societyName: string,
         adminName: string,
-        loginLink: string
+        tempPassword: string
     ): Promise<void> {
         const subject = `Welcome to NexGen Society - ${societyName} Approved!`;
         const html = `
@@ -81,9 +81,12 @@ export class EmailService {
                 <p style="color: #475569; line-height: 1.6;">Hello ${adminName},</p>
                 <p style="color: #475569; line-height: 1.6;">Great news! Your request for <strong>${societyName}</strong> has been approved. You can now log in to your dashboard to complete the setup.</p>
                 <div style="margin: 32px 0;">
-                    <a href="${loginLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Login to Dashboard</a>
+                    <a href="${config.FRONTEND_URL}/login" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Login to Dashboard</a>
                 </div>
-                <p style="color: #64748b; font-size: 14px;">Use your registered email and the password you set during registration to log in.</p>
+                <p style="color: #64748b; font-size: 14px;">Use your registered email and the temporary password system generated for you to log in.</p>
+                <p style="color: #64748b; font-size: 14px;">Temporary Password: ${tempPassword}</p>
+                <p style="color: #64748b; font-size: 14px;">You can change your password after logging in.</p>
+                <p style="color: #64748b; font-size: 14px;">If you have any questions, please contact us at ${config.SUPPORT_EMAIL}.</p>
                 <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 32px 0;" />
                 <p style="color: #94a3b8; font-size: 12px;">NexGen Society SaaS - Empowering Communities</p>
             </div>
