@@ -307,6 +307,7 @@ export class AuthService {
 
         // Send reset email
         const resetUrl = `${config.FRONTEND_URL}/reset-password/${resetToken}`;
+        console.log({ resetUrl });
         await EmailService.sendPasswordResetEmail(user.email, resetUrl);
     }
 

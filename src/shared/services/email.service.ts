@@ -11,6 +11,9 @@ export class EmailService {
             user: config.SMTP_USER,
             pass: config.SMTP_PASS,
         },
+        tls: {
+            rejectUnauthorized: false
+        }
     });
 
     /**
@@ -41,6 +44,7 @@ export class EmailService {
             logger.error({ error, to, subject }, 'Failed to send email');
             // We don't throw here to avoid breaking the core business process
             // but in production you might want more robust error handling
+            return;
         }
     }
 
