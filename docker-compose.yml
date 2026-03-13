@@ -1,40 +1,86 @@
-version: '3.8'
+version: "3.9"
 
 services:
+
   api:
     build:
       context: .
       target: development
+
     container_name: nexgen-api
     ports:
-      - '5000:5000'
+      - "5000:5000"
+
+    env_file:
+      - .env
+
     environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongo:27017/nexgen_society_saas
-      - REDIS_URL=redis://redis:6379
+      NODE_ENV: development
+      MONGODB_URI: ${MONGODB_URI}
+      REDIS_URL: ${REDIS_URL}
+
     volumes:
-      - ./src:/app/src          # Hot-reload in dev
-      - /app/node_modules       # Don't overwrite container modules
+      - ./src:/app/src
+      - /app/node_modules
+
     depends_on:
-      - mongo
-      - redis
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
     restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   mongo:
     image: mongo:7
     container_name: nexgen-mongo
+
     ports:
-      - '27017:27017'
+      - "27017:27017"
+
     volumes:
       - mongo_data:/data/db
+
     restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
     container_name: nexgen-redis
+
     ports:
-      - '6379:6379'
+      - "6379:6379"
+
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+
+    volumes:
+      - redis_data:/data
+
     restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mongo_data:
+  redis_data:

@@ -15,15 +15,15 @@ const server = http.createServer(app);
  * 4. Exit process
  */
 const gracefulShutdown = async (signal: string): Promise<void> => {
-    logger.info(`${signal} received — starting graceful shutdown`);
+    logger.info(`${signal} received - starting graceful shutdown`);
 
     server.close(async () => {
-        logger.info('HTTP server closed — no new connections');
+        logger.info('HTTP server closed - no new connections');
 
         try {
             await disconnectDatabase();
             await disconnectRedis();
-            logger.info('All connections closed — exiting');
+            logger.info('All connections closed - exiting');
             process.exit(0);
         } catch (error) {
             logger.error({ error }, 'Error during shutdown');
@@ -33,7 +33,7 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
 
     // Force exit if graceful shutdown takes too long
     setTimeout(() => {
-        logger.error('Graceful shutdown timed out — forcing exit');
+        logger.error('Graceful shutdown timed out - forcing exit');
         process.exit(1);
     }, 10_000);
 };

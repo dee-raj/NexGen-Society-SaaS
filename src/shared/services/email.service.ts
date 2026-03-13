@@ -1,30 +1,19 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { config } from '../../config';
 import { logger } from '../../config/logger';
 
 export class EmailService {
-    private static transporter = nodemailer.createTransport({
-        host: config.SMTP_HOST,
-        port: config.SMTP_PORT,
-        secure: config.SMTP_PORT === 465, // true for 465, false for other ports
-        auth: {
-            user: config.SMTP_USER,
-            pass: config.SMTP_PASS,
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
+    private static resend = new Resend(config.RESEND_API_KEY || '');
 
     /**
      * Send a generic email.
      */
     static async sendEmail(to: string, subject: string, html: string): Promise<void> {
         try {
-            // If any SMTP config is missing, just log and return in dev
-            if (!config.SMTP_HOST || !config.SMTP_USER || !config.SMTP_PASS) {
-                logger.warn({ to, subject }, 'SMTP not fully configured. Email skipped (logged below).');
-                logger.info('--- EMAIL LOG (SMTP MISSING) ---');
+            // If config is missing, just log and return in dev
+            if (!config.RESEND_API_KEY) {
+                logger.warn({ to, subject }, 'RESEND_API_KEY not configured. Email skipped (logged below).');
+                logger.info('--- EMAIL LOG (RESEND MISSING) ---');
                 logger.info(`To: ${to}`);
                 logger.info(`Subject: ${subject}`);
                 logger.info(`Content: ${html}`);
@@ -32,16 +21,21 @@ export class EmailService {
                 return;
             }
 
-            await this.transporter.sendMail({
+            const { data, error } = await this.resend.emails.send({
                 from: config.EMAIL_FROM,
                 to,
                 subject,
                 html,
             });
 
-            logger.info({ to, subject }, 'Email sent successfully');
+            if (error) {
+                logger.error({ error, to, subject }, 'Failed to send email via Resend');
+                return;
+            }
+
+            logger.info({ to, subject, id: data?.id }, 'Email sent successfully');
         } catch (error) {
-            logger.error({ error, to, subject }, 'Failed to send email');
+            logger.error({ error, to, subject }, 'Exception while sending email');
             // We don't throw here to avoid breaking the core business process
             // but in production you might want more robust error handling
             return;

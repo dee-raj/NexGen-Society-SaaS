@@ -58,52 +58,291 @@ NexGen is designed for horizontal scalability and production-grade SaaS deployme
 ## 🏁 Getting Started
 
 ### Prerequisites
-- Node.js installed
-- MongoDB instance running
 
-### Installation
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Setup environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   *Edit `.env` with your MongoDB URI and JWT secrets.*
+Ensure the following tools are installed:
 
-### Running the App
-- **Development Mode**:
-  ```bash
-  npm run dev
-  ```
-- **Build**:
-  ```bash
-  npm run build
-  ```
-- **Production Mode**:
-  ```bash
-  npm start
-  ```
+* **Node.js ≥ 20**
+* **Docker ≥ 24**
+* **Git**
 
+Optional but recommended for production:
 
-## 🔹 How to deploy / start
+* **Nginx**
+* **Docker Compose**
 
-### Option A: Using Docker & Docker Compose (Recommended for Production)
+---
+
+# 🧪 Development Setup (Local)
+
+Run the application locally using Node.js while MongoDB and Redis run in Docker.
+
+### 1. Clone Repository
+
 ```bash
-# 1. Build and start containers in detached mode
-docker-compose up -d --build
-
-# 2. View application logs
-docker-compose logs -f nexgen-api
-
-# 3. Stop containers
-docker-compose down
+git clone https://github.com/dee-raj/NexGen-Society-SaaS.git
+cd NexGen-Society-SaaS
 ```
-*Note: Ensure `.env.production` is configured before running Docker.*
 
-### Option B: Using PM2 (Bare Metal/VM)
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Example development `.env`:
+
+```env
+NODE_ENV=development
+PORT=5000
+API_PREFIX=/api/v1
+
+MONGODB_URI=mongodb://localhost:27017/nexgen_society_saas
+REDIS_URL=redis://localhost:6379
+```
+
+---
+
+### 4. Start Infrastructure (Mongo + Redis)
+
+```bash
+docker run -d --name nexgen-mongo -p 27017:27017 mongo:7
+
+docker run -d --name jwt-redis -p 6379:6379 redis:7-alpine
+```
+
+---
+
+### 5. Start API Server
+
+```bash
+npm run dev
+```
+
+Server will start at:
+
+```
+http://localhost:5000
+```
+
+Health check:
+
+```
+GET /api/health
+```
+
+---
+
+# 🐳 Production Deployment (Docker)
+
+Production deployments run **all services inside Docker containers** connected through a private network.
+
+---
+
+## 1. Create Docker Network
+
+```bash
+docker network create nexgen-network
+```
+
+This network allows containers to communicate internally.
+
+---
+
+## 2. Create MongoDB Volume
+
+Ensures database persistence.
+
+```bash
+docker volume create nexgen-mongo-data
+```
+
+---
+
+## 3. Start MongoDB
+
+```bash
+docker run -d \
+--name nexgen-mongo \
+--network nexgen-network \
+-v nexgen-mongo-data:/data/db \
+mongo:7
+```
+
+---
+
+## 4. Start Redis
+
+```bash
+docker run -d \
+--name jwt-redis \
+--network nexgen-network \
+-p 6379:6379 \
+redis:7-alpine
+```
+
+---
+
+## 5. Build API Image
+
+Inside the project directory:
+
+```bash
+docker build -t nexgen-saas --target production .
+```
+
+---
+
+## 6. Configure Production Environment
+
+Example `.env`:
+
+```env
+NODE_ENV=production
+PORT=5000
+API_PREFIX=/api/v1
+
+MONGODB_URI=mongodb://nexgen-mongo:27017/nexgen_society_saas
+REDIS_URL=redis://jwt-redis:6379
+```
+
+**⚠️ Important:**
+Inside Docker **never use `localhost`** for services.
+
+---
+
+## 7. Start API Container
+
+```bash
+docker run -d \
+--name nexgen-saas \
+--network nexgen-network \
+-p 5000:5000 \
+--restart unless-stopped \
+--env-file .env \
+nexgen-saas
+```
+
+---
+
+## 8. Verify Application
+
+Check running containers:
+
+```bash
+docker ps
+```
+
+View logs:
+
+```bash
+docker logs -f nexgen-saas
+```
+
+Health check:
+
+```
+http://localhost:5000/health
+```
+
+
+
+# 🔄 Deployment Workflow
+
+Updating production after new commits:
+
+```bash
+git pull origin main
+
+docker build -t nexgen-saas --target production .
+
+docker stop nexgen-saas
+docker rm nexgen-saas
+
+docker run -d \
+--name nexgen-saas \
+--network nexgen-network \
+-p 5000:5000 \
+--restart unless-stopped \
+--env-file .env \
+nexgen-saas
+```
+
+
+# 📦 Container Architecture
+
+Production runtime architecture:
+
+```
+Docker Network: nexgen-network
+
+        ┌───────────────┐
+        │  nexgen-saas  │
+        │   Node API    │
+        └───────┬───────┘
+                │
+        ┌───────┴────────┐
+        │                │
+  nexgen-mongo       jwt-redis
+   MongoDB             Redis
+```
+
+
+# 📊 Logs & Monitoring
+
+Logs can be viewed via Docker:
+
+```bash
+docker logs -f nexgen-saas
+```
+
+Structured logging is implemented using **Pino**.
+
+
+# 🚀 Future Infrastructure Improvements
+
+Planned production improvements:
+
+* Nginx reverse proxy with HTTPS
+* Docker Compose orchestration
+* CI/CD pipeline (GitHub Actions)
+* Centralized log aggregation
+* Kubernetes support
+
+## 🐳 Option B: Using Docker Compose
+
+Instead of running containers manually, NexGen can be started using **Docker Compose**, which orchestrates the entire stack (API, MongoDB, Redis, and Nginx).
+
+### Start the Stack
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+### View Logs
+
+```bash
+docker compose -f docker-compose.prod.yml logs -f api
+```
+
+### Stop the Stack
+
+```bash
+docker compose -f docker-compose.prod.yml down
+```
+
+### Update Deployment
+
+```bash
+git pull origin main
+docker compose -f docker-compose.prod.yml up -d --build
+```
+### Option C: Using PM2 (Bare Metal/VM)
 ```bash
 # 1. Build your project
 npm run build

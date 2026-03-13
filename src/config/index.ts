@@ -35,13 +35,10 @@ const envSchema = z.object({
     // Frontend URL for links
     FRONTEND_URL: z.string().default('http://localhost:5173'),
 
-    // Email (SMTP)
-    SMTP_HOST: z.string().default('smtp.gmail.com'),
-    SMTP_PORT: z.coerce.number().default(587),
-    SMTP_USER: z.string().default('noreply@nexgensociety.com'),
-    SMTP_PASS: z.string().default('password'),
-    EMAIL_FROM: z.string().default('noreply@nexgensociety.com'),
-    SUPPORT_EMAIL: z.string().default('support@nexgensociety.com'),
+    // Email Configuration
+    RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required').optional(),
+    EMAIL_FROM: z.string().default('Nexgen <nexgen@nexgen.dhurbarajjoshi.in>'),
+    SUPPORT_EMAIL: z.string().default('Support <contact@dhurbarajjoshi.in>'),
 
     // Logging
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
