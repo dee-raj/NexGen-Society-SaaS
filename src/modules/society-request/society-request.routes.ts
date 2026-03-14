@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { SocietyRequestController } from './society-request.controller';
-import { createSocietyRequestSchema, approveSocietyRequestSchema, rejectSocietyRequestSchema } from './society-request.validator';
+import {
+    createSocietyRequestSchema,
+    approveSocietyRequestSchema,
+    rejectSocietyRequestSchema,
+    getLogsSchema
+} from './society-request.validator';
 import { validate } from '@shared/middleware/validate';
 import { authenticate, authorize } from '@shared/middleware/authenticate';
 import { Role } from '@shared/utils/constants';
@@ -28,6 +33,19 @@ router.get(
     authenticate,
     authorize([Role.SUPER_ADMIN]),
     SocietyRequestController.getAll,
+);
+
+/**
+ * @route   GET /api/v1/society-requests/logs
+ * @desc    List all approved society requests
+ * @access  Private (Super Admin)
+ */
+router.get(
+    '/logs',
+    authenticate,
+    authorize([Role.SUPER_ADMIN]),
+    validate(getLogsSchema),
+    SocietyRequestController.getLogs,
 );
 
 /**

@@ -23,8 +23,21 @@ export class NoticesController {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 20;
+        const priority = req.query.priority as string | undefined;
+        const isPublished = req.query.isPublished as string | undefined;
+        const search = req.query.search as string | undefined;
 
-        const { data, total } = await NoticesService.findAll(req.tenantId, {}, page, limit);
+        const filter: Record<string, unknown> = {};
+        if (priority) filter.priority = priority;
+        if (isPublished === 'true') filter.isPublished = true;
+        if (isPublished === 'false') filter.isPublished = false;
+
+        if (search) {
+            const regex = new RegExp(search, 'i');
+            filter.$or = [{ title: regex }, { content: regex }];
+        }
+
+        const { data, total } = await NoticesService.findAll(req.tenantId, filter, page, limit);
         ApiResponse.paginated(res, data, total, page, limit);
     });
 

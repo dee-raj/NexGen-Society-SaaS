@@ -21,7 +21,7 @@ export const createNoticeSchema = z.object({
             .optional()
             .default(false),
         expiresAt: z
-            .iso
+            .string()
             .datetime({ message: 'expiresAt must be a valid ISO date' })
             .optional(),
     }).strict(),
@@ -50,7 +50,7 @@ export const updateNoticeSchema = z.object({
             .boolean()
             .optional(),
         expiresAt: z
-            .iso
+            .string()
             .datetime({ message: 'expiresAt must be a valid ISO date' })
             .optional()
             .nullable(),

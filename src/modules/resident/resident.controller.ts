@@ -11,19 +11,19 @@ export class ResidentController {
         const limit = parseInt(req.query.limit as string) || 20;
         const flatId = req.query.flatId as string | undefined;
         const status = req.query.status as string | undefined;
+        const search = req.query.search as string | undefined;
 
         const filter: Record<string, unknown> = {};
         if (flatId) filter.flatId = flatId;
         if (status) filter.status = status;
 
-        const { data, total } = await ResidentService.findAll(req.tenantId, filter, page, limit);
-        console.log({ data });
+        const { data, total } = await ResidentService.findAllResidents(req.tenantId, filter, page, limit, search);
         ApiResponse.paginated(res, data, total, page, limit);
     });
 
     static getById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
         if (!req.tenantId) throw new BadRequestError('Tenant context is required');
-        const resident = await ResidentService.findById(req.tenantId, req.params.id as string);
+        const resident = await ResidentService.findResidentById(req.tenantId, req.params.id as string);
         if (!resident) throw new NotFoundError('Resident');
         ApiResponse.success(res, resident);
     });

@@ -44,6 +44,13 @@ class SocietyRequestControllerClass {
         const result = await SocietyRequestService.rejectRequest(id, reason);
         ApiResponse.success(res, result);
     }
+
+    /** Get logs */
+    async getLogs(req: Request, res: Response) {
+        const { limit } = req.query as { limit: string };
+        const result = await SocietyRequestService.getLogs(Number(limit));
+        ApiResponse.success(res, result);
+    }
 }
 
 export const SocietyRequestController = new SocietyRequestControllerClass();

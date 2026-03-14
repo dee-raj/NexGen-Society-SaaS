@@ -11,10 +11,16 @@ export class StaffController {
         const limit = parseInt(req.query.limit as string) || 20;
         const department = req.query.department as string | undefined;
         const status = req.query.status as string | undefined;
+        const search = req.query.search as string | undefined;
 
         const filter: Record<string, unknown> = {};
         if (department) filter.department = department;
         if (status) filter.status = status;
+
+        if (search) {
+            const regex = new RegExp(search, 'i');
+            filter.$or = [{ fullName: regex }, { department: regex }];
+        }
 
         const { data, total } = await StaffService.findAll(req.tenantId, filter, page, limit);
         ApiResponse.paginated(res, data, total, page, limit);

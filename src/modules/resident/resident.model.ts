@@ -68,6 +68,22 @@ const residentSchema = new Schema<IResident>(
             transform(_doc, ret: Record<string, unknown>) {
                 ret.id = (ret._id as mongoose.Types.ObjectId)?.toString();
                 delete ret.__v;
+
+                // Map populated flatId → flat for the frontend
+                if (ret.flatId && typeof ret.flatId === 'object') {
+                    const flatObj = ret.flatId as Record<string, unknown>;
+                    const flatIdStr = (flatObj.id || flatObj._id)?.toString();
+                    
+                    ret.flat = {
+                        id: flatIdStr,
+                        unitNumber: flatObj.unitNumber,
+                        floor: flatObj.floor,
+                        type: flatObj.type,
+                        buildingId: flatObj.buildingId,
+                    };
+                    ret.flatId = flatIdStr;
+                }
+
                 return ret;
             },
         },

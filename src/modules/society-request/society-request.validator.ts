@@ -64,4 +64,10 @@ export const rejectSocietyRequestSchema = z.object({
     }).strict(),
 });
 
+export const getLogsSchema = z.object({
+    query: z.object({
+        limit: z.string().optional(),
+    }).strict(),
+});
+
 export type CreateSocietyRequestInput = z.infer<typeof createSocietyRequestSchema>['body'];

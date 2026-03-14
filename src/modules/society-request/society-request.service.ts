@@ -7,6 +7,7 @@ import { ISocietyRequest, SocietyRequestStatus } from './society-request.types';
 import { ConflictError, NotFoundError, BadRequestError } from '@shared/utils/api-error';
 import { CreateSocietyRequestInput } from './society-request.validator';
 import { EmailService } from '@shared/services/email.service';
+import { redis } from '@config/redis';
 
 class SocietyRequestServiceClass {
     /** Submit a new society registration request (Public) */
@@ -90,6 +91,21 @@ class SocietyRequestServiceClass {
                 adminId: adminUser[0]._id
             }, 'Society request approved and provisioned');
 
+            // redis logs
+            try {
+                await redis.rpush("society_request_approved", JSON.stringify({
+                    societyId: society._id,
+                    adminId: adminUser[0]._id,
+                    adminName: request.adminName,
+                    adminEmail: request.adminEmail,
+                    societyName: request.societyName,
+                    tempPassword,
+                }));
+                await redis.ltrim("society_request_approved", -1000, -1);
+                await redis.expire("society_request_approved", 60 * 60 * 24 * 7);
+            } catch (err) {
+                logger.error({ err }, "Redis log write failed");
+            }
             // Send welcome email to admin
             await EmailService.sendSocietyApprovedEmail(
                 request.adminEmail,
@@ -116,7 +132,33 @@ class SocietyRequestServiceClass {
         request.rejectionReason = reason;
         await request.save();
 
+        try {
+            await redis.rpush("society_request_rejected", JSON.stringify({
+                requestId: id,
+                adminName: request.adminName,
+                adminEmail: request.adminEmail,
+                societyName: request.societyName,
+                rejectionReason: reason,
+            }));
+            await redis.ltrim("society_request_rejected", -1000, -1);
+            await redis.expire("society_request_rejected", 60 * 60 * 24 * 7);
+        } catch (err) {
+            logger.error({ err }, "Redis log write failed");
+        }
+
         return request;
+    }
+
+    /** Get logs */
+    async getLogs(limit: number = 30) {
+        try {
+            const approvedLogs = await redis.lrange("society_request_approved", -limit, -1);
+            const rejectedLogs = await redis.lrange("society_request_rejected", -limit, -1);
+            return [...approvedLogs, ...rejectedLogs].map(log => JSON.parse(log)).sort((a, b) => b.createdAt - a.createdAt);
+        } catch (error) {
+            logger.error({ error }, "Redis log read failed");
+            throw error;
+        }
     }
 }
 
